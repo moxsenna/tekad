@@ -124,7 +124,6 @@ function handleRegisterLead(payload) {
   }
 
   var sheet = getOrCreateSheet(SHEET_LEADS, LEADS_HEADERS);
-  ensureHeaders(sheet, LEADS_HEADERS);
 
   var submittedAt = payload.submitted_at || new Date().toISOString();
   var whatsappRaw = sanitizeText(payload.whatsapp);
@@ -204,7 +203,6 @@ function handleRegisterAffiliate(payload) {
   }
 
   var sheet = getOrCreateSheet(SHEET_AFFILIATES, AFFILIATES_HEADERS);
-  ensureHeaders(sheet, AFFILIATES_HEADERS);
 
   var kodeRef = generateAffiliateCode(nama);
   var baseUrl = getSetting('base_webinar_url', SETTINGS_DEFAULTS.base_webinar_url);
@@ -343,51 +341,94 @@ function getOrCreateSheet(name, headers) {
   return sheet;
 }
 
-function ensureHeaders(sheet, headers) {
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(headers);
-    return;
-  }
-
+function getActiveHeaders(sheet) {
   var lastCol = Math.max(sheet.getLastColumn(), 1);
-  var existingRow = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  var existingHeaders = [];
+  var headerRow = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var headers = [];
 
-  for (var i = 0; i < existingRow.length; i++) {
-    var cell = sanitizeText(existingRow[i]);
-    if (cell) existingHeaders.push(cell);
+  for (var i = 0; i < headerRow.length; i++) {
+    headers.push(sanitizeText(headerRow[i]));
   }
 
-  if (existingHeaders.length === 0) {
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    return;
+  return headers;
+}
+
+function getNonEmptyHeaders(headers) {
+  var result = [];
+  for (var i = 0; i < headers.length; i++) {
+    if (headers[i]) result.push(headers[i]);
+  }
+  return result;
+}
+
+function ensureHeaders(sheet, expectedHeaders) {
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, expectedHeaders.length).setValues([expectedHeaders]);
+    return expectedHeaders.slice();
+  }
+
+  var activeHeaders = getActiveHeaders(sheet);
+  var nonEmptyHeaders = getNonEmptyHeaders(activeHeaders);
+
+  if (nonEmptyHeaders.length === 0) {
+    sheet.getRange(1, 1, 1, expectedHeaders.length).setValues([expectedHeaders]);
+    return expectedHeaders.slice();
   }
 
   var missing = [];
-  for (var j = 0; j < headers.length; j++) {
-    if (existingHeaders.indexOf(headers[j]) === -1) {
-      missing.push(headers[j]);
+  for (var j = 0; j < expectedHeaders.length; j++) {
+    if (nonEmptyHeaders.indexOf(expectedHeaders[j]) === -1) {
+      missing.push(expectedHeaders[j]);
     }
   }
 
   if (missing.length > 0) {
-    var startCol = existingHeaders.length + 1;
-    sheet.getRange(1, startCol, 1, startCol + missing.length - 1).setValues([missing]);
+    var startCol = nonEmptyHeaders.length + 1;
+    sheet.getRange(1, startCol, 1, missing.length).setValues([missing]);
   }
+
+  return getActiveHeaders(sheet);
+}
+
+function buildRowFromHeaders(headers, dataMap) {
+  var row = [];
+
+  for (var i = 0; i < headers.length; i++) {
+    var header = headers[i];
+    if (!header) {
+      row.push('');
+      continue;
+    }
+
+    row.push(
+      dataMap.hasOwnProperty(header) && dataMap[header] !== undefined && dataMap[header] !== null
+        ? dataMap[header]
+        : ''
+    );
+  }
+
+  return row;
 }
 
 function appendRowByHeaders(sheet, expectedHeaders, dataMap) {
-  ensureHeaders(sheet, expectedHeaders);
-  var lastCol = sheet.getLastColumn();
-  var headerRow = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  var row = [];
+  var sheetName = sheet.getName();
+  var headers = ensureHeaders(sheet, expectedHeaders);
+  var row = buildRowFromHeaders(headers, dataMap);
 
-  for (var i = 0; i < headerRow.length; i++) {
-    var key = sanitizeText(headerRow[i]);
-    row.push(key && dataMap.hasOwnProperty(key) ? dataMap[key] : '');
+  if (row.length !== headers.length) {
+    var mismatchMsg =
+      'Sheet column mismatch: sheet=' +
+      sheetName +
+      ', headerCount=' +
+      headers.length +
+      ', rowCount=' +
+      row.length;
+    Logger.log(mismatchMsg);
+    throw new Error(mismatchMsg);
   }
 
-  sheet.appendRow(row);
+  var nextRow = sheet.getLastRow() + 1;
+  sheet.getRange(nextRow, 1, 1, headers.length).setValues([row]);
 }
 
 // ── Helpers: settings ──────────────────────────────────────────

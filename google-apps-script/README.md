@@ -5,6 +5,7 @@ Backend TEKAD mendukung:
 - **Lead webinar** (format lama, backward compatible)
 - **Lead webinar + referral** (`ref_code` opsional)
 - **Pendaftaran affiliate** (`action: registerAffiliate`)
+- **Lookup affiliate by WhatsApp** (`action: lookupAffiliate`)
 
 ---
 
@@ -41,6 +42,17 @@ Header minimal (Apps Script akan melengkapi kolom yang belum ada):
 | **affiliate_name** | **Baru** — nama affiliate hasil lookup |
 
 > Jika sheet `Leads` production sudah punya 17 kolom lama, deploy script baru akan **menambah** `ref_code` dan `affiliate_name` di kolom R–S tanpa menghapus data lama.
+
+### Auto-ensure headers
+
+Script otomatis membaca header baris 1, menambahkan kolom yang belum ada di kanan, lalu menulis data sebagai object → row sesuai urutan header aktual. **Jangan merge/gabung sel di baris 1.**
+
+Jika muncul error `Jumlah kolom pada data tidak cocok dengan jumlah kolom pada rentang`:
+
+1. Deploy ulang `Code.gs` terbaru dari repo
+2. Buka tab `Leads` → pastikan baris 1 tidak ada sel yang di-merge
+3. Pastikan header `ref_code` dan `affiliate_name` ada di kolom paling kanan (atau biarkan script menambahkannya)
+4. Hapus baris header rusak jika sempat ter-overwrite salah, lalu isi ulang 19 header sesuai tabel di atas
 
 ### Tab `affiliates` (baru)
 
