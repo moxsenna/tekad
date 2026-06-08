@@ -28,6 +28,10 @@ const env = loadEnv();
 const GAS_URL = env.VITE_GOOGLE_SCRIPT_URL;
 const FORM_TOKEN = env.VITE_FORM_TOKEN;
 const WA_REDIRECT = env.VITE_WHATSAPP_REDIRECT_URL;
+const WA_ADMIN_PHONE = env.VITE_WHATSAPP_ADMIN_PHONE || '';
+const WEBINAR_THEME = 'Mendampingi Anak Menyiapkan Masa Depan di Era AI';
+const WEBINAR_HEADLINE =
+  'Mendampingi Anak Menemukan Arah dan Siap Menghadapi Dunia Kerja';
 
 const results = [];
 
@@ -1180,8 +1184,26 @@ function fbqViewContentVariant(calls, variant) {
     (args) =>
       args[0] === 'track' &&
       args[1] === 'ViewContent' &&
-      args[2]?.lp_variant === variant
+      args[2]?.lp_variant === variant &&
+      String(args[2]?.content_name || '').includes(WEBINAR_THEME)
   );
+}
+
+async function testWhatsAppHelper() {
+  log('\n=== WhatsApp Helper Unit Tests ===');
+  const { spawnSync } = await import('child_process');
+  const result = spawnSync('npx', ['--yes', 'tsx', 'scripts/whatsapp-test-runner.ts'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    shell: true,
+  });
+
+  const output = `${result.stdout || ''}${result.stderr || ''}`.trim();
+  if (output) log(output);
+
+  const passCount = (output.match(/PASS —/g) || []).length;
+  const failCount = (output.match(/FAIL —/g) || []).length;
+  record('WhatsApp helper unit tests', result.status === 0 && failCount === 0, `${passCount} pass, ${failCount} fail`);
 }
 
 async function testLandingV2(context) {
@@ -1190,7 +1212,7 @@ async function testLandingV2(context) {
 
   await page.goto(`${BASE_URL}/v2`);
   const headlineVisible = await page
-    .getByRole('heading', { name: 'Bantu Anak dari Bingung Arah Menjadi Siap Kerja' })
+    .getByRole('heading', { name: WEBINAR_HEADLINE })
     .first()
     .isVisible();
   record('V2: headline visible', headlineVisible);
@@ -1217,10 +1239,16 @@ async function testLandingV2(context) {
     { nama: 'E2E Browser V2', whatsapp: '081222222299' },
     `${BASE_URL}/v2`
   );
+  const dynamicWa =
+    !WA_ADMIN_PHONE ||
+    (v2Submit.finalUrl.includes(`phone=${WA_ADMIN_PHONE}`) &&
+      v2Submit.finalUrl.includes(encodeURIComponent(WEBINAR_THEME)));
   record(
     'V2: submit + WhatsApp redirect',
-    v2Submit.submitOk && v2Submit.capturedPayload?.nama_orang_tua === 'E2E Browser V2',
-    `redirect=${v2Submit.redirected}, url=${v2Submit.finalUrl.slice(0, 80)}`
+    v2Submit.submitOk &&
+      v2Submit.capturedPayload?.nama_orang_tua === 'E2E Browser V2' &&
+      dynamicWa,
+    `redirect=${v2Submit.redirected}, url=${v2Submit.finalUrl.slice(0, 120)}`
   );
 }
 
@@ -1274,6 +1302,21 @@ async function testMetaPixelTracking(context) {
     !JSON.stringify(submitCalls).match(/081333333301|E2E Pixel Lead/),
     'checked serialized calls'
   );
+  record(
+    'Pixel: Lead uses final webinar theme',
+    submitCalls.some(
+      (args) =>
+        args[0] === 'track' &&
+        args[1] === 'Lead' &&
+        String(args[2]?.content_name || '').includes(WEBINAR_THEME)
+    )
+  );
+  record(
+    'Pixel: success event excludes source field',
+    submitCalls
+      .filter((args) => args[0] === 'trackCustom' && args[1] === 'WebinarRegistrationSuccess')
+      .every((args) => args[2]?.source === undefined)
+  );
 }
 
 async function main() {
@@ -1285,6 +1328,7 @@ async function main() {
   record('GAS doGet health check', health.success === true, health.message);
 
   const gasSamples = await testGasDirect();
+  await testWhatsAppHelper();
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
@@ -1298,12 +1342,17 @@ async function main() {
       nama: 'E2E Browser Direct',
       whatsapp: '081222222201',
     });
+    const b1DynamicWa =
+      !WA_ADMIN_PHONE ||
+      (b1.finalUrl.includes(`phone=${WA_ADMIN_PHONE}`) &&
+        b1.finalUrl.includes(encodeURIComponent('E2E Browser Direct')));
     record(
       'Browser submit direct + redirect',
       b1.submitOk &&
         b1.capturedPayload?.source === 'direct' &&
-        b1.capturedPayload?.ref_code === 'DIRECT',
-      `redirect=${b1.redirected}, source=${b1.capturedPayload?.source}, ref_code=${b1.capturedPayload?.ref_code}, url=${b1.finalUrl.slice(0, 80)}`
+        b1.capturedPayload?.ref_code === 'DIRECT' &&
+        b1DynamicWa,
+      `redirect=${b1.redirected}, source=${b1.capturedPayload?.source}, ref_code=${b1.capturedPayload?.ref_code}, url=${b1.finalUrl.slice(0, 120)}`
     );
 
     // Browser submit: wa_status

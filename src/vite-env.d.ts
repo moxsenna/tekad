@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_SCRIPT_URL: string;
+  readonly VITE_WHATSAPP_ADMIN_PHONE: string;
   readonly VITE_WHATSAPP_REDIRECT_URL: string;
   readonly VITE_FORM_TOKEN: string;
 }

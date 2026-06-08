@@ -1,11 +1,12 @@
 import type { OpenFormFn } from '../../lib/metaPixel';
+import { WEBINAR_HEADLINE, WEBINAR_SUBHEADLINE } from '../../lib/webinarCopy';
 
 interface V2HeroSectionProps {
   onOpenForm: OpenFormFn;
 }
 
 const HERO_BULLETS = [
-  'Bingung mau kuliah, kerja, atau mulai dari mana',
+  'Anak masih bingung mau kuliah, kerja, atau mulai dari mana',
   'Sering pegang HP, tapi belum produktif',
   'Belum punya skill yang bisa ditunjukkan',
   'Belum punya portofolio',
@@ -19,11 +20,8 @@ export function V2HeroSection({ onOpenForm }: V2HeroSectionProps) {
         <div className="v2-hero__grid">
           <div>
             <span className="v2-kicker">WEBINAR GRATIS UNTUK ORANG TUA</span>
-            <h1 className="v2-hero__title">Bantu Anak dari Bingung Arah Menjadi Siap Kerja</h1>
-            <p className="v2-hero__subtitle">
-              Panduan praktis untuk Ayah/Bunda yang ingin membantu anak setelah SMA/SMK/kuliah agar
-              punya arah, skill digital, dan lebih percaya diri menghadapi dunia kerja di era AI.
-            </p>
+            <h1 className="v2-hero__title">{WEBINAR_HEADLINE}</h1>
+            <p className="v2-hero__subtitle">{WEBINAR_SUBHEADLINE}</p>
             <ul className="v2-list">
               {HERO_BULLETS.map((item) => (
                 <li key={item}>{item}</li>
@@ -36,7 +34,7 @@ export function V2HeroSection({ onOpenForm }: V2HeroSectionProps) {
             >
               Daftar Webinar Gratis
             </button>
-            <p className="v2-microcopy">Gratis. Link webinar dikirim lewat WhatsApp.</p>
+            <p className="v2-microcopy">Gratis. Jadwal dan link webinar dikirim melalui WhatsApp.</p>
           </div>
           <figure>
             <img

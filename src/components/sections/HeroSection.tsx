@@ -1,5 +1,6 @@
-import { Calendar, Clock, Gift, MessageCircle, Video } from 'lucide-react';
+import { Calendar, Clock, Gift, MapPin, Video } from 'lucide-react';
 import type { OpenFormFn } from '../../lib/metaPixel';
+import { WEBINAR_HEADLINE, WEBINAR_SUBHEADLINE, WEBINAR_THEME } from '../../lib/webinarCopy';
 
 interface HeroSectionProps {
   onOpenForm: OpenFormFn;
@@ -13,14 +14,8 @@ export function HeroSection({ onOpenForm }: HeroSectionProps) {
           <div className="hero__copy">
             <div className="hero__lead">
               <span className="hero__eyebrow">WEBINAR GRATIS UNTUK ORANG TUA</span>
-              <h1 className="hero__title">
-                Bantu Anak dari Bingung Arah Menjadi Siap Kerja
-              </h1>
-              <p className="hero__subtitle">
-                Panduan praktis untuk Ayah/Bunda yang ingin membantu anak setelah SMA/SMK/kuliah
-                agar punya arah, skill digital, dan lebih percaya diri menghadapi dunia kerja di
-                era AI.
-              </p>
+              <h1 className="hero__title">{WEBINAR_HEADLINE}</h1>
+              <p className="hero__subtitle">{WEBINAR_SUBHEADLINE}</p>
             </div>
             <div className="hero__rest">
               <div className="hero__actions">
@@ -46,23 +41,19 @@ export function HeroSection({ onOpenForm }: HeroSectionProps) {
                 </div>
                 <div className="event-card__item">
                   <Calendar size={18} aria-hidden="true" />
-                  <span>21 Juni 2026</span>
-                </div>
-                <div className="event-card__item">
-                  <Clock size={18} aria-hidden="true" />
-                  <span>Pukul 19:00 WIB</span>
+                  <span>Tema: {WEBINAR_THEME}</span>
                 </div>
                 <div className="event-card__item">
                   <Calendar size={18} aria-hidden="true" />
-                  <span>Tema: Dari Bingung Arah Menjadi Siap Kerja</span>
+                  <span>Hari: Minggu, 21 Juni 2026</span>
                 </div>
                 <div className="event-card__item">
-                  <Video size={18} aria-hidden="true" />
-                  <span>Durasi: 90 menit</span>
+                  <Clock size={18} aria-hidden="true" />
+                  <span>Jam: 19:00 WIB</span>
                 </div>
                 <div className="event-card__item">
-                  <MessageCircle size={18} aria-hidden="true" />
-                  <span>Link dikirim melalui WhatsApp</span>
+                  <MapPin size={18} aria-hidden="true" />
+                  <span>Tempat: Online</span>
                 </div>
                 <div className="event-card__item event-card__item--bonus">
                   <Gift size={18} aria-hidden="true" />

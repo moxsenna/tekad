@@ -7,7 +7,10 @@ const ROADMAP_CARDS = [
     text: 'Mulai mengenal AI, konten, desain, media sosial, dan digital marketing.',
   },
   { title: 'Portofolio', text: 'Anak belajar membuat karya yang bisa ditunjukkan.' },
-  { title: 'Lebih Siap Kerja', text: 'Anak lebih percaya diri menghadapi dunia kerja.' },
+  {
+    title: 'Lebih Siap Menghadapi Dunia Kerja',
+    text: 'Anak lebih percaya diri menghadapi masa depan.',
+  },
 ] as const;
 
 interface V2RoadmapSectionProps {
@@ -18,10 +21,12 @@ export function V2RoadmapSection({ onOpenForm }: V2RoadmapSectionProps) {
   return (
     <section className="v2-section" id="alur">
       <div className="container">
-        <h2 className="v2-section__title">Dari Bingung Arah Menuju Lebih Siap Kerja</h2>
+        <h2 className="v2-section__title">
+          Dari Bingung Arah Menuju Lebih Siap Menghadapi Dunia Kerja
+        </h2>
         <img
           src="/roadmap-anak-siap-kerja.webp"
-          alt="Roadmap: Bingung Arah, Skill Digital, Portofolio, Lebih Siap Kerja"
+          alt="Roadmap: Bingung Arah, Skill Digital, Portofolio, Lebih Siap Menghadapi Dunia Kerja"
           className="v2-roadmap__image"
           width={540}
           height={960}

@@ -18,8 +18,8 @@ const ROADMAP_STEPS = [
   },
   {
     number: 4,
-    title: 'Lebih Siap Kerja',
-    text: 'Anak lebih percaya diri menghadapi dunia kerja.',
+    title: 'Lebih Siap Menghadapi Dunia Kerja',
+    text: 'Anak lebih percaya diri menghadapi masa depan.',
   },
 ] as const;
 
@@ -33,7 +33,9 @@ export function RoadmapSection({ onOpenForm }: RoadmapSectionProps) {
       <div className="container">
         <div className="roadmap__grid">
           <div className="roadmap__content">
-            <h2 className="section__title">Dari Bingung Arah Menuju Lebih Siap Kerja</h2>
+            <h2 className="section__title">
+              Dari Bingung Arah Menuju Lebih Siap Menghadapi Dunia Kerja
+            </h2>
             <p className="section__subtitle section__subtitle--roadmap">
               Webinar ini membantu Bapak/Ibu melihat gambaran sederhana perjalanan anak: mulai dari
               menemukan arah, mengenal skill digital, membuat karya, sampai lebih percaya diri
@@ -52,7 +54,7 @@ export function RoadmapSection({ onOpenForm }: RoadmapSectionProps) {
             <figure className="roadmap__visual">
               <img
                 src="/roadmap-anak-siap-kerja.webp"
-                alt="Roadmap Karir Digital Anakmu: 4 langkah dari Bingung Arah, Skill Digital, Portofolio, hingga Lebih Siap Kerja"
+                alt="Roadmap: Bingung Arah, Skill Digital, Portofolio, hingga Lebih Siap Menghadapi Dunia Kerja"
                 className="roadmap__image"
                 width={540}
                 height={960}

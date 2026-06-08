@@ -1,5 +1,7 @@
+import { WEBINAR_THEME } from '../../lib/webinarCopy';
+
 const EVENT_ROWS = [
-  { label: 'Tema', value: 'Dari Bingung Arah Menjadi Siap Kerja' },
+  { label: 'Tema', value: WEBINAR_THEME },
   { label: 'Hari', value: 'Minggu, 21 Juni 2026' },
   { label: 'Jam', value: '19:00 WIB' },
   { label: 'Tempat', value: 'Online' },

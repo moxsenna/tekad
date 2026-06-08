@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:whatsapp": "npx --yes tsx scripts/whatsapp-test-runner.ts"
   },
   "dependencies": {
     "lucide-react": "^0.511.0",

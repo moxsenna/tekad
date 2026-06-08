@@ -1,4 +1,5 @@
 import type { LpVariant } from './routing';
+import { WEBINAR_THEME } from './webinarCopy';
 
 export const META_PIXEL_ID = '3987008871597140';
 
@@ -92,7 +93,9 @@ export function trackLandingPageView(lpVariant: LpVariant): void {
   trackPageView();
   trackViewContent({
     content_name:
-      lpVariant === 'v2' ? 'TEKAD Webinar Landing V2 FSP' : 'TEKAD Webinar Landing Main',
+      lpVariant === 'v2'
+        ? `TEKAD Webinar V2 FSP - ${WEBINAR_THEME}`
+        : `TEKAD Webinar Main - ${WEBINAR_THEME}`,
     content_category: 'webinar',
     lp_variant: lpVariant,
   });
@@ -127,16 +130,15 @@ export function trackWebinarFormReview(lpVariant: LpVariant): void {
 
 export function trackWebinarRegistrationSuccess(
   lpVariant: LpVariant,
-  tracking: { source: string; utm_source: string; utm_medium: string; utm_campaign: string }
+  tracking: { utm_source: string; utm_medium: string; utm_campaign: string }
 ): void {
   trackLead({
-    content_name: 'TEKAD Webinar Registration',
+    content_name: `TEKAD Webinar Registration - ${WEBINAR_THEME}`,
     content_category: 'webinar',
     lp_variant: lpVariant,
   });
   trackCustom('WebinarRegistrationSuccess', {
     lp_variant: lpVariant,
-    source: tracking.source,
     utm_source: tracking.utm_source || undefined,
     utm_medium: tracking.utm_medium || undefined,
     utm_campaign: tracking.utm_campaign || undefined,

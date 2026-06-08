@@ -17,7 +17,7 @@ import {
   TOTAL_QUESTION_STEPS,
 } from '../../lib/formConfig';
 import { submitLead } from '../../lib/submitLead';
-import { redirectToWhatsApp, getWhatsAppRedirectUrl } from '../../lib/whatsapp';
+import { buildWhatsAppRedirectUrl, redirectToWhatsApp } from '../../lib/whatsapp';
 import { Logo } from '../layout/Logo';
 import { ChoiceCard } from './ChoiceCard';
 import { ProgressBar } from './ProgressBar';
@@ -112,7 +112,7 @@ export function TypeformLeadForm({
       trackWebinarRegistrationSuccess(lpVariant, tracking);
       setTimeout(() => {
         trackWebinarWhatsAppRedirect(lpVariant);
-        redirectToWhatsApp();
+        redirectToWhatsApp(formData);
       }, 1500);
     } else {
       setSubmitStatus('error');
@@ -315,11 +315,11 @@ export function TypeformLeadForm({
             {submitStatus === 'success' && (
               <div className="form-success" role="status">
                 {submitMessage}
-                {getWhatsAppRedirectUrl() !== '#' && (
+                {buildWhatsAppRedirectUrl(formData) !== '#' && (
                   <>
                     {' '}
-                    <a href={getWhatsAppRedirectUrl()}>Klik di sini</a> jika belum diarahkan
-                    otomatis.
+                    <a href={buildWhatsAppRedirectUrl(formData)}>Klik di sini</a> jika belum
+                    diarahkan otomatis.
                   </>
                 )}
               </div>
