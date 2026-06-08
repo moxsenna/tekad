@@ -3,27 +3,31 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { StickyMobileCta } from '../components/layout/StickyMobileCta';
 import { TypeformLeadForm } from '../components/form/TypeformLeadForm';
-import { HeroSection } from '../components/sections/HeroSection';
-import { TrustStrip } from '../components/sections/TrustStrip';
-import { ProblemSection } from '../components/sections/ProblemSection';
-import { RoadmapSection } from '../components/sections/RoadmapSection';
-import { BenefitSection } from '../components/sections/BenefitSection';
-import { AudienceSection } from '../components/sections/AudienceSection';
-import { MaterialSection } from '../components/sections/MaterialSection';
-import { AfterRegisterSection } from '../components/sections/AfterRegisterSection';
-import { TekadSection } from '../components/sections/TekadSection';
-import { FormCtaSection } from '../components/sections/FormCtaSection';
+import { V2HeroSection } from '../components/v2/V2HeroSection';
+import { V2EventInfoSection } from '../components/v2/V2EventInfoSection';
+import { V2ProblemSection } from '../components/v2/V2ProblemSection';
+import { V2RoadmapSection } from '../components/v2/V2RoadmapSection';
+import { V2BenefitSection } from '../components/v2/V2BenefitSection';
+import { V2AudienceSection } from '../components/v2/V2AudienceSection';
+import { V2MaterialSection } from '../components/v2/V2MaterialSection';
+import { V2AfterRegisterSection } from '../components/v2/V2AfterRegisterSection';
+import { V2TekadSection } from '../components/v2/V2TekadSection';
+import { V2CtaSection } from '../components/v2/V2CtaSection';
 import { lookupAffiliateByCode } from '../lib/lookupAffiliateByCode';
+import {
+  trackLandingPageView,
+  trackWebinarFormOpen,
+  type CtaLocation,
+} from '../lib/metaPixel';
 import { getEffectiveReferral, isDirectReferral } from '../lib/referral';
 import {
   clearReferralDisplay,
   loadReferralDisplay,
   saveReferralDisplay,
 } from '../lib/referralDisplay';
-import { trackLandingPageView, trackWebinarFormOpen, type CtaLocation } from '../lib/metaPixel';
 import { captureTracking } from '../lib/tracking';
 
-export function WebinarLandingPage() {
+export function LandingPageV2() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const refCode = useMemo(() => getEffectiveReferral(), []);
   const [referralDisplayName, setReferralDisplayName] = useState<string | null>(() => {
@@ -40,7 +44,7 @@ export function WebinarLandingPage() {
   );
 
   useEffect(() => {
-    trackLandingPageView('main');
+    trackLandingPageView('v2');
   }, []);
 
   useEffect(() => {
@@ -77,7 +81,7 @@ export function WebinarLandingPage() {
   }, [refCode]);
 
   const openForm = useCallback((location: CtaLocation) => {
-    trackWebinarFormOpen('main', location);
+    trackWebinarFormOpen('v2', location);
     setIsFormOpen(true);
   }, []);
 
@@ -86,19 +90,19 @@ export function WebinarLandingPage() {
   }, []);
 
   return (
-    <>
-      <Header onOpenForm={openForm} />
+    <div className="lp-v2">
+      <Header onOpenForm={openForm} className="v2-header" />
       <main>
-        <HeroSection onOpenForm={openForm} />
-        <TrustStrip />
-        <ProblemSection />
-        <RoadmapSection onOpenForm={openForm} />
-        <BenefitSection />
-        <AudienceSection />
-        <MaterialSection />
-        <AfterRegisterSection />
-        <TekadSection />
-        <FormCtaSection onOpenForm={openForm} />
+        <V2HeroSection onOpenForm={openForm} />
+        <V2EventInfoSection />
+        <V2ProblemSection />
+        <V2RoadmapSection onOpenForm={openForm} />
+        <V2BenefitSection />
+        <V2AudienceSection />
+        <V2MaterialSection />
+        <V2AfterRegisterSection />
+        <V2TekadSection />
+        <V2CtaSection onOpenForm={openForm} />
       </main>
       {referralDisplayName && (
         <div className="referral-badge" role="status">
@@ -115,8 +119,8 @@ export function WebinarLandingPage() {
         onClose={closeForm}
         tracking={tracking}
         refCode={refCode}
-        lpVariant="main"
+        lpVariant="v2"
       />
-    </>
+    </div>
   );
 }

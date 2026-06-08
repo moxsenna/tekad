@@ -81,6 +81,10 @@ function doPost(e) {
       return handleLookupAffiliate(payload);
     }
 
+    if (action === 'lookupAffiliateByCode') {
+      return handleLookupAffiliateByCode(payload);
+    }
+
     // Legacy webinar lead (no action) + explicit registerLead
     return handleRegisterLead(payload);
   } catch (err) {
@@ -92,7 +96,7 @@ function doGet() {
   return jsonResponse({
     success: true,
     message: 'TEKAD Webinar Lead + Affiliate API is running',
-    actions: ['registerLead', 'registerAffiliate', 'lookupAffiliate'],
+    actions: ['registerLead', 'registerAffiliate', 'lookupAffiliate', 'lookupAffiliateByCode'],
   });
 }
 
@@ -273,6 +277,28 @@ function handleLookupAffiliate(payload) {
     kode_ref: affiliate.kode_ref,
     link_ref: affiliate.link_ref,
     caption: buildAffiliateCaption(affiliate.link_ref),
+  });
+}
+
+function handleLookupAffiliateByCode(payload) {
+  if (!validateToken(payload)) {
+    return affiliateResponse(false, 'VALIDATION_ERROR', 'Invalid token');
+  }
+
+  var refCode = resolveRefCode(payload.ref_code);
+  if (refCode === 'DIRECT') {
+    return affiliateResponse(false, 'NOT_FOUND', 'Affiliate tidak ditemukan.');
+  }
+
+  var affiliate = lookupAffiliateByCode(refCode);
+  if (!affiliate || !affiliate.nama) {
+    return affiliateResponse(false, 'NOT_FOUND', 'Affiliate tidak ditemukan.');
+  }
+
+  return jsonResponse({
+    ok: true,
+    ref_code: affiliate.kode_ref,
+    affiliate_name: affiliate.nama,
   });
 }
 
@@ -614,21 +640,22 @@ function lookupAffiliateByCode(refCode) {
   if (codeCol === -1) return null;
 
   var rows = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  var lastMatch = null;
 
   for (var r = 0; r < rows.length; r++) {
     var rowCode = sanitizeText(rows[r][codeCol - 1]).toUpperCase();
     if (rowCode !== code) continue;
 
     var status = statusCol > 0 ? sanitizeText(rows[r][statusCol - 1]).toLowerCase() : 'active';
-    if (status === 'inactive') return null;
+    if (status === 'inactive') continue;
 
-    return {
+    lastMatch = {
       kode_ref: rowCode,
       nama: namaCol > 0 ? sanitizeText(rows[r][namaCol - 1]) : '',
     };
   }
 
-  return null;
+  return lastMatch;
 }
 
 function buildAffiliateLink(baseUrl, kodeRef) {

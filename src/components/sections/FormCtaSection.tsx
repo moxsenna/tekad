@@ -1,5 +1,7 @@
+import type { OpenFormFn } from '../../lib/metaPixel';
+
 interface FormCtaSectionProps {
-  onOpenForm: () => void;
+  onOpenForm: OpenFormFn;
 }
 
 export function FormCtaSection({ onOpenForm }: FormCtaSectionProps) {
@@ -11,7 +13,11 @@ export function FormCtaSection({ onOpenForm }: FormCtaSectionProps) {
           Isi data singkat agar tim TEKAD dapat mengirim jadwal webinar, link masuk, dan checklist
           kesiapan kerja anak melalui WhatsApp.
         </p>
-        <button type="button" className="btn btn--primary btn--lg" onClick={onOpenForm}>
+        <button
+          type="button"
+          className="btn btn--primary btn--lg"
+          onClick={() => onOpenForm('final')}
+        >
           Mulai Daftar Gratis
         </button>
         <p className="cta-section__microcopy">Proses daftar kurang dari 2 menit.</p>

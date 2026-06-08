@@ -241,8 +241,8 @@ async function testBrowserValidation(page) {
   await form(page).getByRole('button', { name: 'Tutup form' }).click();
 }
 
-async function testBrowserSubmitWithRedirect(page, query, { nama, whatsapp }) {
-  const url = query ? `${BASE_URL}/?${query}` : BASE_URL;
+async function testBrowserSubmitWithRedirect(page, query, { nama, whatsapp }, basePath = BASE_URL) {
+  const url = query ? `${basePath}/?${query}` : basePath;
   let gasResponse = null;
   let capturedPayload = null;
 
@@ -539,7 +539,57 @@ async function testMobileFormLayout(page) {
 
 async function clearReferralStorage(page) {
   await page.goto(BASE_URL);
-  await page.evaluate(() => localStorage.removeItem('tekad_ref_code'));
+  await page.evaluate(() => {
+    localStorage.removeItem('tekad_ref_code');
+    localStorage.removeItem('tekad_referral_display');
+  });
+}
+
+function resolveReferralLookupMock(payload) {
+  if (payload.action !== 'lookupAffiliateByCode') return null;
+
+  const code = String(payload.ref_code || '').toUpperCase();
+  if (code === 'BIMA-4821' || code === 'MOX-5289') {
+    return { ok: true, ref_code: code, affiliate_name: 'Mox' };
+  }
+
+  return {
+    ok: false,
+    error: 'NOT_FOUND',
+    message: 'Affiliate tidak ditemukan.',
+  };
+}
+
+async function setupReferralLookupMock(page, leadResponder) {
+  await page.route(GAS_URL, async (route) => {
+    if (route.request().method() === 'POST') {
+      let payload = null;
+      try {
+        payload = JSON.parse(route.request().postData() || '{}');
+      } catch {
+        payload = null;
+      }
+
+      const lookupMock = payload ? resolveReferralLookupMock(payload) : null;
+      let body;
+
+      if (lookupMock) {
+        body = lookupMock;
+      } else if (typeof leadResponder === 'function') {
+        body = await leadResponder(payload, route);
+      } else {
+        body = { success: true, message: 'Lead saved' };
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/plain',
+        body: JSON.stringify(body),
+      });
+      return;
+    }
+    await route.continue();
+  });
 }
 
 async function clearAffiliateStorage(page) {
@@ -876,6 +926,9 @@ async function testAffiliatePage(context) {
   let leadPayload = null;
 
   await mockGasPost(e2ePage, (payload) => {
+    const lookupMock = resolveReferralLookupMock(payload);
+    if (lookupMock) return lookupMock;
+
     if (payload.action === 'registerAffiliate') {
       affiliateRegisterPayload = payload;
       return {
@@ -900,10 +953,12 @@ async function testAffiliatePage(context) {
   await e2ePage.locator('.affiliate-success').waitFor({ state: 'visible', timeout: 5000 });
 
   await e2ePage.goto(`${BASE_URL}/webinar?ref=BIMA-4821`);
+  await e2ePage.locator('.referral-badge').waitFor({ state: 'visible', timeout: 5000 });
   const badgeText = (await e2ePage.locator('.referral-badge').textContent()) || '';
   record(
     'Affiliate E2E: referral link shows badge',
-    /Direkomendasikan oleh\s*BIMA-4821/i.test(badgeText.replace(/\s+/g, ' ').trim()),
+    /Direkomendasikan oleh\s*Mox/i.test(badgeText.replace(/\s+/g, ' ').trim()) &&
+      !/BIMA-4821/i.test(badgeText),
     badgeText.trim()
   );
 
@@ -935,31 +990,82 @@ async function testReferralTracking(context) {
   const noBadgeVisible = await badge(noRefPage).isVisible().catch(() => false);
   record('Referral: no ref no badge', !noBadgeVisible);
 
-  // ?ref=BIMA-4821 → badge visible
+  // ?ref=MOX-5289 + lookup mock → badge shows affiliate name, not code
   const refPage = await context.newPage();
   await clearReferralStorage(refPage);
-  await refPage.goto(`${BASE_URL}/webinar?ref=BIMA-4821`);
+  await setupReferralLookupMock(refPage);
+  await refPage.goto(`${BASE_URL}/webinar?ref=MOX-5289`);
+  await badge(refPage).waitFor({ state: 'visible', timeout: 5000 });
   const refBadgeText = (await badge(refPage).textContent()) || '';
   record(
-    'Referral: ?ref=BIMA-4821 badge visible',
-    /Direkomendasikan oleh\s*BIMA-4821/i.test(refBadgeText.replace(/\s+/g, ' ').trim()),
+    'Referral: ?ref=MOX-5289 shows affiliate name',
+    /Direkomendasikan oleh\s*Mox/i.test(refBadgeText.replace(/\s+/g, ' ').trim()) &&
+      !/MOX-5289/i.test(refBadgeText),
     refBadgeText.trim()
   );
 
-  // Reload without query → badge persists from localStorage
+  // Badge near bottom, not under header/hero
+  const badgeBox = await badge(refPage).boundingBox();
+  const headerBox = await refPage.locator('.header').boundingBox();
+  const heroBox = await refPage.locator('.hero').boundingBox();
+  const footerBox = await refPage.locator('.footer').boundingBox();
+  const badgeBelowHero =
+    badgeBox && heroBox ? badgeBox.y > heroBox.y + heroBox.height - 24 : false;
+  const badgeNotUnderHeader =
+    badgeBox && headerBox ? badgeBox.y > headerBox.y + headerBox.height : false;
+  const badgeNearFooter =
+    badgeBox && footerBox ? badgeBox.y < footerBox.y + 8 : false;
+  record(
+    'Referral: badge near bottom not on hero',
+    badgeBelowHero && badgeNotUnderHeader && badgeNearFooter,
+    `badgeY=${badgeBox ? Math.round(badgeBox.y) : 'n/a'}, footerY=${footerBox ? Math.round(footerBox.y) : 'n/a'}`
+  );
+
+  // Reload without query → badge persists from localStorage display cache
   await refPage.goto(`${BASE_URL}/webinar`);
+  await badge(refPage).waitFor({ state: 'visible', timeout: 5000 });
   const persistedText = (await badge(refPage).textContent()) || '';
   const storedCode = await refPage.evaluate(() => localStorage.getItem('tekad_ref_code'));
+  const storedDisplay = await refPage.evaluate(() => localStorage.getItem('tekad_referral_display'));
   record(
-    'Referral: reload without query persists',
-    /BIMA-4821/i.test(persistedText) && storedCode === 'BIMA-4821',
+    'Referral: reload without query persists display name',
+    /Direkomendasikan oleh\s*Mox/i.test(persistedText.replace(/\s+/g, ' ').trim()) &&
+      storedCode === 'MOX-5289' &&
+      storedDisplay?.includes('Mox'),
     `badge="${persistedText.trim()}", stored=${storedCode}`
   );
 
-  // Malicious ref → sanitized safe (no angle brackets), invalid chars → DIRECT
+  // Lookup fail → no badge, submit still sends ref_code
+  const failPage = await context.newPage();
+  let failLeadPayload = null;
+  await setupReferralLookupMock(failPage, (payload) => {
+    failLeadPayload = payload;
+    return { success: true, message: 'Lead saved' };
+  });
+  await clearReferralStorage(failPage);
+  await failPage.goto(`${BASE_URL}/webinar?ref=UNKNOWN-9999`);
+  await failPage.waitForTimeout(1200);
+  const failBadgeVisible = await badge(failPage).isVisible().catch(() => false);
+  await fillFormSteps(failPage, { nama: 'E2E Ref Unknown', whatsapp: '081999999903' });
+  await failPage.getByRole('button', { name: 'Kirim Pendaftaran' }).click();
+  await failPage.waitForTimeout(1500);
+  record(
+    'Referral: lookup fail hides badge',
+    !failBadgeVisible,
+    `badgeVisible=${failBadgeVisible}`
+  );
+  record(
+    'Referral: lookup fail still submits ref_code',
+    failLeadPayload?.ref_code === 'UNKNOWN-9999',
+    `ref_code=${failLeadPayload?.ref_code ?? '(missing)'}`
+  );
+
+  // Malicious ref → sanitized safe (no angle brackets)
   const scriptPage = await context.newPage();
+  await setupReferralLookupMock(scriptPage);
   await clearReferralStorage(scriptPage);
   await scriptPage.goto(`${BASE_URL}/webinar?ref=%3Cscript%3E`);
+  await scriptPage.waitForTimeout(1200);
   const scriptBadgeVisible = await badge(scriptPage).isVisible().catch(() => false);
   const scriptBadgeText = scriptBadgeVisible ? (await badge(scriptPage).textContent()) || '' : '';
   const scriptStored = await scriptPage.evaluate(() => localStorage.getItem('tekad_ref_code'));
@@ -980,21 +1086,9 @@ async function testReferralTracking(context) {
   // Mock GAS: submit from referral link includes ref_code
   const payloadPage = await context.newPage();
   let capturedPayload = null;
-  await payloadPage.route(GAS_URL, async (route) => {
-    if (route.request().method() === 'POST') {
-      try {
-        capturedPayload = JSON.parse(route.request().postData() || '{}');
-      } catch {
-        capturedPayload = null;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/plain',
-        body: JSON.stringify({ success: true, message: 'Lead saved' }),
-      });
-      return;
-    }
-    await route.continue();
+  await setupReferralLookupMock(payloadPage, (payload) => {
+    capturedPayload = payload;
+    return { success: true, message: 'Lead saved' };
   });
 
   await clearReferralStorage(payloadPage);
@@ -1053,6 +1147,127 @@ async function testBrowserBackPreservesData(page) {
   const val = await form(page).getByPlaceholder('08xxxxxxxxxx').inputValue();
   record('Back preserves WhatsApp answer', val === '081111111188', `value=${val}`);
   await form(page).getByRole('button', { name: 'Tutup form' }).click();
+}
+
+async function installFbqStub(page) {
+  await page.addInitScript(() => {
+    window.__fbqCalls = [];
+    const stub = (...args) => {
+      window.__fbqCalls.push(args);
+    };
+    stub.queue = [];
+    stub.loaded = true;
+    stub.version = '2.0';
+    window.fbq = stub;
+    window._fbq = stub;
+  });
+}
+
+async function getFbqCalls(page) {
+  return page.evaluate(() => window.__fbqCalls || []);
+}
+
+function fbqHasStandardEvent(calls, eventName) {
+  return calls.some((args) => args[0] === 'track' && args[1] === eventName);
+}
+
+function fbqHasCustomEvent(calls, eventName) {
+  return calls.some((args) => args[0] === 'trackCustom' && args[1] === eventName);
+}
+
+function fbqViewContentVariant(calls, variant) {
+  return calls.some(
+    (args) =>
+      args[0] === 'track' &&
+      args[1] === 'ViewContent' &&
+      args[2]?.lp_variant === variant
+  );
+}
+
+async function testLandingV2(context) {
+  log('\n=== Landing V2 Tests ===');
+  const page = await context.newPage();
+
+  await page.goto(`${BASE_URL}/v2`);
+  const headlineVisible = await page
+    .getByRole('heading', { name: 'Bantu Anak dari Bingung Arah Menjadi Siap Kerja' })
+    .first()
+    .isVisible();
+  record('V2: headline visible', headlineVisible);
+
+  const eventInfo = await page.getByText('Minggu, 21 Juni 2026').isVisible();
+  record('V2: event date visible', eventInfo);
+
+  await openForm(page);
+  const formVisible = await form(page).isVisible();
+  record('V2: form opens from CTA', formVisible);
+  await form(page).getByRole('button', { name: 'Tutup form' }).click();
+
+  await page.setViewportSize({ width: 320, height: 678 });
+  const overflow = await assertNoHorizontalOverflow(page);
+  record(
+    'V2: no horizontal overflow 320px',
+    overflow.ok,
+    `doc=${overflow.docWidth}, vw=${overflow.viewWidth}`
+  );
+
+  const v2Submit = await testBrowserSubmitWithRedirect(
+    await context.newPage(),
+    '',
+    { nama: 'E2E Browser V2', whatsapp: '081222222299' },
+    `${BASE_URL}/v2`
+  );
+  record(
+    'V2: submit + WhatsApp redirect',
+    v2Submit.submitOk && v2Submit.capturedPayload?.nama_orang_tua === 'E2E Browser V2',
+    `redirect=${v2Submit.redirected}, url=${v2Submit.finalUrl.slice(0, 80)}`
+  );
+}
+
+async function testMetaPixelTracking(context) {
+  log('\n=== Meta Pixel Tracking Tests ===');
+  const page = await context.newPage();
+  await installFbqStub(page);
+
+  await page.goto(`${BASE_URL}/`);
+  await page.waitForTimeout(500);
+  let calls = await getFbqCalls(page);
+
+  record('Pixel: init on main LP', calls.some((args) => args[0] === 'init' && args[1] === '3987008871597140'));
+  record('Pixel: PageView on main LP', fbqHasStandardEvent(calls, 'PageView'));
+  record('Pixel: ViewContent main variant', fbqViewContentVariant(calls, 'main'));
+
+  await openForm(page);
+  await page.waitForTimeout(200);
+  calls = await getFbqCalls(page);
+  record('Pixel: WebinarFormOpen on main LP', fbqHasCustomEvent(calls, 'WebinarFormOpen'));
+
+  await form(page).getByRole('button', { name: 'Tutup form' }).click();
+
+  const v2Page = await context.newPage();
+  await installFbqStub(v2Page);
+  await v2Page.goto(`${BASE_URL}/v2`);
+  await v2Page.waitForTimeout(500);
+  const v2Calls = await getFbqCalls(v2Page);
+  record('Pixel: ViewContent v2 variant', fbqViewContentVariant(v2Calls, 'v2'));
+
+  const submitPage = await context.newPage();
+  await installFbqStub(submitPage);
+  await submitPage.goto(`${BASE_URL}/v2`);
+  await fillFormSteps(submitPage, { nama: 'E2E Pixel Lead', whatsapp: '081333333301' });
+  await submitPage.getByRole('button', { name: 'Kirim Pendaftaran' }).click();
+  await submitPage.waitForTimeout(2000);
+  const submitCalls = await getFbqCalls(submitPage);
+  record('Pixel: Lead on submit success', fbqHasStandardEvent(submitCalls, 'Lead'));
+  record(
+    'Pixel: WebinarRegistrationSuccess on submit',
+    fbqHasCustomEvent(submitCalls, 'WebinarRegistrationSuccess')
+  );
+  record(
+    'Pixel: no PII in fbq calls',
+    !JSON.stringify(submitCalls).match(/081333333301|E2E Pixel Lead/),
+    'checked serialized calls'
+  );
 }
 
 async function main() {
@@ -1138,6 +1353,8 @@ async function main() {
     await testBrowserBackPreservesData(await context.newPage());
     await testMobileLandingOverflow(await context.newPage());
     await testMobileFormLayout(await context.newPage());
+    await testLandingV2(context);
+    await testMetaPixelTracking(context);
   } finally {
     await browser.close();
   }

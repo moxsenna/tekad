@@ -30,8 +30,7 @@ export function MaterialSection() {
           ))}
         </div>
         <p className="material-note">
-          Termasuk gambaran langkah 90 hari untuk mulai membangun kebiasaan produktif dan portofolio
-          awal.
+          Termasuk gambaran langkah awal untuk membangun kebiasaan produktif dan portofolio anak.
         </p>
       </div>
     </section>

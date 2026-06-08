@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import type { OpenFormFn } from '../../lib/metaPixel';
 
 interface StickyMobileCtaProps {
-  onOpenForm: () => void;
+  onOpenForm: OpenFormFn;
   isFormOpen: boolean;
 }
 
@@ -25,7 +26,11 @@ export function StickyMobileCta({ onOpenForm, isFormOpen }: StickyMobileCtaProps
 
   return (
     <div className="sticky-cta" role="complementary" aria-label="Daftar webinar">
-      <button type="button" className="btn btn--primary sticky-cta__btn" onClick={onOpenForm}>
+      <button
+        type="button"
+        className="btn btn--primary sticky-cta__btn"
+        onClick={() => onOpenForm('sticky')}
+      >
         Daftar Gratis
       </button>
       <span className="sticky-cta__micro">Webinar gratis via WhatsApp</span>

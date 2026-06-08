@@ -1,12 +1,14 @@
+import type { OpenFormFn } from '../../lib/metaPixel';
 import { Logo } from './Logo';
 
 interface HeaderProps {
-  onOpenForm: () => void;
+  onOpenForm: OpenFormFn;
+  className?: string;
 }
 
-export function Header({ onOpenForm }: HeaderProps) {
+export function Header({ onOpenForm, className }: HeaderProps) {
   return (
-    <header className="header">
+    <header className={className ? `header ${className}` : 'header'}>
       <div className="container header__inner">
         <a href="#" className="header__logo" aria-label="TEKAD — Talent Digital Academy">
           <Logo className="logo--header" />
@@ -17,7 +19,11 @@ export function Header({ onOpenForm }: HeaderProps) {
           <a href="#tentang">Tentang</a>
           <a href="#daftar">Daftar</a>
         </nav>
-        <button type="button" className="btn btn--primary btn--sm" onClick={onOpenForm}>
+        <button
+          type="button"
+          className="btn btn--primary btn--sm"
+          onClick={() => onOpenForm('header')}
+        >
           Daftar Gratis
         </button>
       </div>

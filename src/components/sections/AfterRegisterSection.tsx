@@ -9,7 +9,7 @@ const steps = [
   {
     icon: MessageCircle,
     title: 'Tim TEKAD mengirim jadwal',
-    text: 'Jadwal dan link webinar dikirim melalui WhatsApp.',
+    text: 'Jadwal (21 Juni 2026, pukul 19:00 WIB) dan link webinar dikirim melalui WhatsApp.',
   },
   {
     icon: Video,

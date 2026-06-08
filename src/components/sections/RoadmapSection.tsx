@@ -1,3 +1,5 @@
+import type { OpenFormFn } from '../../lib/metaPixel';
+
 const ROADMAP_STEPS = [
   {
     number: 1,
@@ -22,7 +24,7 @@ const ROADMAP_STEPS = [
 ] as const;
 
 interface RoadmapSectionProps {
-  onOpenForm: () => void;
+  onOpenForm: OpenFormFn;
 }
 
 export function RoadmapSection({ onOpenForm }: RoadmapSectionProps) {
@@ -40,7 +42,7 @@ export function RoadmapSection({ onOpenForm }: RoadmapSectionProps) {
             <button
               type="button"
               className="btn btn--primary roadmap__cta-desktop"
-              onClick={onOpenForm}
+              onClick={() => onOpenForm('roadmap')}
             >
               Mulai dari Webinar Gratis
             </button>

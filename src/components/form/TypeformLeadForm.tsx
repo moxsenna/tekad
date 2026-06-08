@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import type { TrackingData } from '../../types/lead';
 import { useFormState } from '../../hooks/useFormState';
+import {
+  trackWebinarFormReview,
+  trackWebinarFormStart,
+  trackWebinarFormStep,
+  trackWebinarRegistrationSuccess,
+  trackWebinarWhatsAppRedirect,
+} from '../../lib/metaPixel';
+import type { LpVariant } from '../../lib/routing';
 import {
   KONSULTASI_OPTIONS,
   KONDISI_ANAK_OPTIONS,
@@ -20,17 +28,27 @@ interface TypeformLeadFormProps {
   onClose: () => void;
   tracking: TrackingData;
   refCode: string;
+  lpVariant: LpVariant;
 }
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error';
 
-export function TypeformLeadForm({ isOpen, onClose, tracking, refCode }: TypeformLeadFormProps) {
+const TRACKED_FORM_STEPS = new Set(['nama_orang_tua', 'whatsapp', 'review']);
+
+export function TypeformLeadForm({
+  isOpen,
+  onClose,
+  tracking,
+  refCode,
+  lpVariant,
+}: TypeformLeadFormProps) {
   const {
     currentStep,
     formData,
     error,
     honeypot,
     progressPercent,
+    stepIndex,
     updateField,
     setHoneypot,
     goNext,
@@ -42,6 +60,7 @@ export function TypeformLeadForm({ isOpen, onClose, tracking, refCode }: Typefor
 
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
+  const trackedStepsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (isOpen) {
@@ -51,11 +70,24 @@ export function TypeformLeadForm({ isOpen, onClose, tracking, refCode }: Typefor
       reset();
       setSubmitStatus('idle');
       setSubmitMessage('');
+      trackedStepsRef.current.clear();
     }
     return () => {
       document.body.style.overflow = '';
     };
   }, [isOpen, reset]);
+
+  useEffect(() => {
+    if (!isOpen || !TRACKED_FORM_STEPS.has(currentStep)) return;
+    if (trackedStepsRef.current.has(currentStep)) return;
+
+    trackedStepsRef.current.add(currentStep);
+    trackWebinarFormStep(lpVariant, stepIndex, currentStep);
+
+    if (currentStep === 'review') {
+      trackWebinarFormReview(lpVariant);
+    }
+  }, [currentStep, isOpen, lpVariant, stepIndex]);
 
   const handleClose = useCallback(() => {
     onClose();
@@ -77,7 +109,9 @@ export function TypeformLeadForm({ isOpen, onClose, tracking, refCode }: Typefor
     if (result.success) {
       setSubmitStatus('success');
       setSubmitMessage('Pendaftaran berhasil. Mengarahkan ke WhatsApp…');
+      trackWebinarRegistrationSuccess(lpVariant, tracking);
       setTimeout(() => {
+        trackWebinarWhatsAppRedirect(lpVariant);
         redirectToWhatsApp();
       }, 1500);
     } else {
@@ -87,7 +121,7 @@ export function TypeformLeadForm({ isOpen, onClose, tracking, refCode }: Typefor
       );
       setError(result.message || 'Maaf, pendaftaran belum berhasil terkirim. Silakan coba lagi.');
     }
-  }, [formData, tracking, refCode, honeypot, setError]);
+  }, [formData, tracking, refCode, honeypot, setError, lpVariant]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -309,7 +343,14 @@ export function TypeformLeadForm({ isOpen, onClose, tracking, refCode }: Typefor
     if (currentStep === 'welcome') {
       return (
         <div className="form-overlay__footer form-overlay__footer--single">
-          <button type="button" className="btn btn--primary" onClick={goNext}>
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() => {
+              trackWebinarFormStart(lpVariant);
+              goNext();
+            }}
+          >
             Mulai Daftar
           </button>
         </div>

@@ -1,6 +1,11 @@
 # Landing Page Webinar TEKAD
 
-Landing page pendaftaran webinar gratis **"Dari Bingung Arah Menjadi Siap Kerja"** untuk LPK TEKAD, dengan program mitra affiliate dan referral tracking.
+Landing page webinar gratis **"Bantu Anak dari Bingung Arah Menjadi Siap Kerja"** (tema: *Dari Bingung Arah Menjadi Siap Kerja*) untuk LPK TEKAD, dengan program mitra affiliate dan referral tracking.
+
+**Copy utama (hero):**
+- Kicker: WEBINAR GRATIS UNTUK ORANG TUA
+- Headline: Bantu Anak dari Bingung Arah Menjadi Siap Kerja
+- Subheadline: Panduan praktis untuk Ayah/Bunda yang ingin membantu anak setelah SMA/SMK/kuliah agar punya arah, skill digital, dan lebih percaya diri menghadapi dunia kerja di era AI.
 
 ## Stack
 

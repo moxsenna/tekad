@@ -5,6 +5,7 @@ import './styles/global.css';
 import './styles/landing.css';
 import './styles/form.css';
 import './styles/affiliate.css';
+import './styles/v2.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

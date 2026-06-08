@@ -1,7 +1,8 @@
-import { Calendar, Gift, MessageCircle, Video } from 'lucide-react';
+import { Calendar, Clock, Gift, MessageCircle, Video } from 'lucide-react';
+import type { OpenFormFn } from '../../lib/metaPixel';
 
 interface HeroSectionProps {
-  onOpenForm: () => void;
+  onOpenForm: OpenFormFn;
 }
 
 export function HeroSection({ onOpenForm }: HeroSectionProps) {
@@ -11,24 +12,23 @@ export function HeroSection({ onOpenForm }: HeroSectionProps) {
         <div className="hero__grid">
           <div className="hero__copy">
             <div className="hero__lead">
-              <span className="hero__eyebrow">Webinar Gratis untuk Orang Tua</span>
-              <p className="hero__hook">
-                Satu langkah Bapak/Ibu hari ini bisa menjadi awal anak lebih siap menghadapi masa
-                depannya.
-              </p>
+              <span className="hero__eyebrow">WEBINAR GRATIS UNTUK ORANG TUA</span>
               <h1 className="hero__title">
-                Anak Masih Bingung Arah? Bantu Ia Menemukan Arah, Membangun Skill, dan Lebih
-                Percaya Diri
+                Bantu Anak dari Bingung Arah Menjadi Siap Kerja
               </h1>
               <p className="hero__subtitle">
-                Webinar gratis untuk orang tua yang ingin membantu anak setelah SMA/SMK/kuliah agar
-                mulai punya arah, skill praktis, dan lebih siap menghadapi dunia kerja di era
-                digital dan AI.
+                Panduan praktis untuk Ayah/Bunda yang ingin membantu anak setelah SMA/SMK/kuliah
+                agar punya arah, skill digital, dan lebih percaya diri menghadapi dunia kerja di
+                era AI.
               </p>
             </div>
             <div className="hero__rest">
               <div className="hero__actions">
-                <button type="button" className="btn btn--primary btn--lg" onClick={onOpenForm}>
+                <button
+                  type="button"
+                  className="btn btn--primary btn--lg"
+                  onClick={() => onOpenForm('hero')}
+                >
                   Daftar Webinar Gratis
                 </button>
                 <a href="#alur" className="btn btn--secondary btn--lg">
@@ -43,6 +43,14 @@ export function HeroSection({ onOpenForm }: HeroSectionProps) {
                 <div className="event-card__item">
                   <Video size={18} aria-hidden="true" />
                   <span>Webinar Online Gratis</span>
+                </div>
+                <div className="event-card__item">
+                  <Calendar size={18} aria-hidden="true" />
+                  <span>21 Juni 2026</span>
+                </div>
+                <div className="event-card__item">
+                  <Clock size={18} aria-hidden="true" />
+                  <span>Pukul 19:00 WIB</span>
                 </div>
                 <div className="event-card__item">
                   <Calendar size={18} aria-hidden="true" />
