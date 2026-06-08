@@ -542,6 +542,11 @@ async function clearReferralStorage(page) {
   await page.evaluate(() => localStorage.removeItem('tekad_ref_code'));
 }
 
+async function clearAffiliateStorage(page) {
+  await page.goto(BASE_URL);
+  await page.evaluate(() => localStorage.removeItem('tekad_affiliate_profile'));
+}
+
 async function mockGasPost(page, responder) {
   await page.route(GAS_URL, async (route) => {
     if (route.request().method() === 'POST') {
@@ -571,18 +576,23 @@ async function gotoAffiliate(page) {
   await page.getByRole('heading', { name: 'Jadi Mitra Affiliate TEKAD' }).waitFor();
 }
 
+function affiliateRegisterForm(page) {
+  return page.locator('.affiliate-form');
+}
+
 async function fillAffiliateRequired(page, { nama, whatsapp, kota, agreeTerms = false }) {
+  const formScope = affiliateRegisterForm(page);
   if (nama !== undefined) {
-    await page.getByPlaceholder('Contoh: Bima Senna').fill(nama);
+    await formScope.getByPlaceholder('Contoh: Bima Senna').fill(nama);
   }
   if (whatsapp !== undefined) {
-    await page.getByPlaceholder('08xxxxxxxxxx').fill(whatsapp);
+    await formScope.getByPlaceholder('08xxxxxxxxxx').fill(whatsapp);
   }
   if (kota !== undefined) {
-    await page.getByPlaceholder('Contoh: Cirebon').fill(kota);
+    await formScope.getByPlaceholder('Contoh: Cirebon').fill(kota);
   }
   if (agreeTerms) {
-    await page.locator('.affiliate-consent input[type="checkbox"]').check();
+    await formScope.locator('.affiliate-consent input[type="checkbox"]').check();
   }
 }
 
@@ -590,8 +600,20 @@ async function submitAffiliateForm(page) {
   await page.getByRole('button', { name: 'Daftar & Buat Link Affiliate' }).click();
 }
 
+async function fillAffiliateLookup(page, whatsapp) {
+  await page.locator('.affiliate-lookup').getByPlaceholder('08xxxxxxxxxx').fill(whatsapp);
+}
+
+async function submitAffiliateLookup(page) {
+  await page.getByRole('button', { name: 'Lihat Link Saya' }).click();
+}
+
 async function affiliateErrorText(page) {
-  return (await page.locator('.affiliate-form__error').textContent()) || '';
+  return (await affiliateRegisterForm(page).locator('.affiliate-form__error').textContent()) || '';
+}
+
+async function affiliateLookupErrorText(page) {
+  return (await page.locator('.affiliate-lookup__error').textContent()) || '';
 }
 
 const AFFILIATE_SUCCESS_MOCK = {
@@ -607,17 +629,20 @@ async function testAffiliatePage(context) {
 
   // A. Render page + required fields
   const renderPage = await context.newPage();
+  await clearAffiliateStorage(renderPage);
   await gotoAffiliate(renderPage);
   const headlineVisible = await renderPage
     .getByRole('heading', { name: 'Jadi Mitra Affiliate TEKAD' })
     .isVisible();
-  const namaField = await renderPage.getByPlaceholder('Contoh: Bima Senna').isVisible();
-  const waField = await renderPage.getByPlaceholder('08xxxxxxxxxx').isVisible();
-  const kotaField = await renderPage.getByPlaceholder('Contoh: Cirebon').isVisible();
-  const consentVisible = await renderPage.locator('.affiliate-consent').isVisible();
+  const lookupVisible = await renderPage.getByRole('heading', { name: 'Sudah pernah daftar?' }).isVisible();
+  const registerForm = affiliateRegisterForm(renderPage);
+  const namaField = await registerForm.getByPlaceholder('Contoh: Bima Senna').isVisible();
+  const waField = await registerForm.getByPlaceholder('08xxxxxxxxxx').isVisible();
+  const kotaField = await registerForm.getByPlaceholder('Contoh: Cirebon').isVisible();
+  const consentVisible = await registerForm.locator('.affiliate-consent').isVisible();
   record(
     'Affiliate: page render + required fields',
-    headlineVisible && namaField && waField && kotaField && consentVisible
+    headlineVisible && lookupVisible && namaField && waField && kotaField && consentVisible
   );
 
   for (const width of [390, 414]) {
@@ -633,6 +658,7 @@ async function testAffiliatePage(context) {
 
   // B. Validation
   const validationPage = await context.newPage();
+  await clearAffiliateStorage(validationPage);
   await gotoAffiliate(validationPage);
   await submitAffiliateForm(validationPage);
   const namaErr = await affiliateErrorText(validationPage);
@@ -677,6 +703,7 @@ async function testAffiliatePage(context) {
     affiliatePayload = payload;
     return AFFILIATE_SUCCESS_MOCK;
   });
+  await clearAffiliateStorage(successPage);
   await gotoAffiliate(successPage);
   await fillAffiliateRequired(successPage, {
     nama: 'E2E Affiliate Success',
@@ -720,6 +747,39 @@ async function testAffiliatePage(context) {
   const successStillVisible = await successPage.locator('.affiliate-success').isVisible();
   record('Affiliate: success card persists after copy', successStillVisible);
 
+  const storedProfile = await successPage.evaluate(() => {
+    const raw = localStorage.getItem('tekad_affiliate_profile');
+    return raw ? JSON.parse(raw) : null;
+  });
+  record(
+    'Affiliate: register success saves localStorage',
+    storedProfile?.kode_ref === 'BIMA-4821' &&
+      storedProfile?.link_ref?.includes('BIMA-4821') &&
+      !('rekening' in (storedProfile || {})) &&
+      !('nama_rekening' in (storedProfile || {})),
+    `kode_ref=${storedProfile?.kode_ref ?? '(missing)'}`
+  );
+
+  await successPage.reload({ waitUntil: 'networkidle' });
+  const restoredVisible = await successPage.locator('.affiliate-success').isVisible({ timeout: 5000 });
+  const restoredCode = await successPage.locator('.affiliate-success__code').textContent();
+  record(
+    'Affiliate: refresh restores success card',
+    restoredVisible && restoredCode?.trim() === 'BIMA-4821',
+    `code=${restoredCode?.trim()}`
+  );
+
+  await successPage.getByRole('button', { name: 'Gunakan nomor lain / daftar baru' }).click();
+  await affiliateRegisterForm(successPage).getByPlaceholder('Contoh: Bima Senna').waitFor({
+    state: 'visible',
+    timeout: 5000,
+  });
+  const clearedProfile = await successPage.evaluate(() => localStorage.getItem('tekad_affiliate_profile'));
+  record(
+    'Affiliate: reset clears localStorage and shows form',
+    clearedProfile === null
+  );
+
   // D. Submit error with mock GAS
   const errorPage = await context.newPage();
   await mockGasPost(errorPage, {
@@ -727,6 +787,7 @@ async function testAffiliatePage(context) {
     error: 'VALIDATION_ERROR',
     message: 'Nomor WhatsApp wajib diisi.',
   });
+  await clearAffiliateStorage(errorPage);
   await gotoAffiliate(errorPage);
   await fillAffiliateRequired(errorPage, {
     nama: 'E2E Affiliate Error',
@@ -741,6 +802,72 @@ async function testAffiliatePage(context) {
     'Affiliate: submit error message from GAS',
     /Nomor WhatsApp wajib diisi/i.test(apiError),
     apiError.trim()
+  );
+
+  // F. Lookup affiliate success with mock GAS
+  const lookupPage = await context.newPage();
+  let lookupPayload = null;
+  const LOOKUP_SUCCESS_MOCK = {
+    ok: true,
+    nama: 'E2E Lookup User',
+    kode_ref: 'LOOKUP-1234',
+    link_ref: 'https://example.com/webinar?ref=LOOKUP-1234',
+    caption: 'Caption lookup https://example.com/webinar?ref=LOOKUP-1234',
+  };
+  await mockGasPost(lookupPage, (payload) => {
+    lookupPayload = payload;
+    if (payload.action === 'lookupAffiliate') {
+      return LOOKUP_SUCCESS_MOCK;
+    }
+    return { ok: false, error: 'UNEXPECTED', message: 'Unexpected action' };
+  });
+  await clearAffiliateStorage(lookupPage);
+  await gotoAffiliate(lookupPage);
+  await fillAffiliateLookup(lookupPage, '081234567899');
+  await submitAffiliateLookup(lookupPage);
+  await lookupPage.locator('.affiliate-success').waitFor({ state: 'visible', timeout: 5000 });
+  const lookupCode = await lookupPage.locator('.affiliate-success__code').textContent();
+  const lookupStored = await lookupPage.evaluate(() => {
+    const raw = localStorage.getItem('tekad_affiliate_profile');
+    return raw ? JSON.parse(raw) : null;
+  });
+  const successDom = (await lookupPage.locator('.affiliate-success').textContent()) || '';
+  record(
+    'Affiliate: lookup success payload',
+    lookupPayload?.action === 'lookupAffiliate' &&
+      lookupPayload?.token === FORM_TOKEN &&
+      lookupPayload?.whatsapp === '081234567899',
+    `action=${lookupPayload?.action}`
+  );
+  record(
+    'Affiliate: lookup success card + localStorage',
+    lookupCode?.trim() === 'LOOKUP-1234' && lookupStored?.kode_ref === 'LOOKUP-1234',
+    `code=${lookupCode?.trim()}`
+  );
+  record(
+    'Affiliate: lookup success hides sensitive data',
+    !/catatan_admin|nama_rekening|payout|komisi terkumpul/i.test(successDom) &&
+      !successDom.includes('1234567890'),
+    'checked success card only'
+  );
+
+  // G. Lookup not found
+  const lookupFailPage = await context.newPage();
+  await mockGasPost(lookupFailPage, {
+    ok: false,
+    error: 'NOT_FOUND',
+    message: 'Nomor WhatsApp belum terdaftar sebagai affiliate.',
+  });
+  await clearAffiliateStorage(lookupFailPage);
+  await gotoAffiliate(lookupFailPage);
+  await fillAffiliateLookup(lookupFailPage, '081999999999');
+  await submitAffiliateLookup(lookupFailPage);
+  await lookupFailPage.waitForTimeout(500);
+  const lookupFailErr = await affiliateLookupErrorText(lookupFailPage);
+  record(
+    'Affiliate: lookup not found error',
+    /belum terdaftar sebagai affiliate/i.test(lookupFailErr),
+    lookupFailErr.trim()
   );
 
   // E. End-to-end referral local flow
@@ -761,6 +888,7 @@ async function testAffiliatePage(context) {
   });
 
   await clearReferralStorage(e2ePage);
+  await clearAffiliateStorage(e2ePage);
   await gotoAffiliate(e2ePage);
   await fillAffiliateRequired(e2ePage, {
     nama: 'E2E Affiliate E2E',

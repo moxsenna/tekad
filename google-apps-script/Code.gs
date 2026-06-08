@@ -10,6 +10,7 @@
  * - (tanpa action)     → submit lead webinar legacy (backward compatible)
  * - registerLead       → submit lead webinar (+ ref_code opsional)
  * - registerAffiliate  → daftar affiliate baru
+ * - lookupAffiliate    → cari affiliate by WhatsApp (data aman saja)
  */
 
 var SHEET_LEADS = 'Leads';
@@ -76,6 +77,10 @@ function doPost(e) {
       return handleRegisterAffiliate(payload);
     }
 
+    if (action === 'lookupAffiliate') {
+      return handleLookupAffiliate(payload);
+    }
+
     // Legacy webinar lead (no action) + explicit registerLead
     return handleRegisterLead(payload);
   } catch (err) {
@@ -87,7 +92,7 @@ function doGet() {
   return jsonResponse({
     success: true,
     message: 'TEKAD Webinar Lead + Affiliate API is running',
-    actions: ['registerLead', 'registerAffiliate'],
+    actions: ['registerLead', 'registerAffiliate', 'lookupAffiliate'],
   });
 }
 
@@ -231,6 +236,45 @@ function handleRegisterAffiliate(payload) {
     kode_ref: kodeRef,
     link_ref: linkRef,
     caption: buildAffiliateCaption(linkRef),
+  });
+}
+
+// ── Affiliate lookup ───────────────────────────────────────────
+
+function handleLookupAffiliate(payload) {
+  if (!validateToken(payload)) {
+    return affiliateResponse(false, 'VALIDATION_ERROR', 'Invalid token');
+  }
+
+  var whatsapp = sanitizeText(payload.whatsapp);
+  if (!whatsapp) {
+    return affiliateResponse(false, 'VALIDATION_ERROR', 'Nomor WhatsApp wajib diisi.');
+  }
+
+  var whatsappNorm = normalizeWhatsApp(whatsapp);
+  if (whatsappNorm.length < 10 || whatsappNorm.length > 15) {
+    return affiliateResponse(
+      false,
+      'VALIDATION_ERROR',
+      'Nomor WhatsApp tidak valid. Minimal 10 digit, maksimal 15 digit.'
+    );
+  }
+
+  var affiliate = lookupAffiliateByWhatsApp(whatsappNorm);
+  if (!affiliate) {
+    return affiliateResponse(
+      false,
+      'NOT_FOUND',
+      'Nomor WhatsApp belum terdaftar sebagai affiliate.'
+    );
+  }
+
+  return jsonResponse({
+    ok: true,
+    nama: affiliate.nama,
+    kode_ref: affiliate.kode_ref,
+    link_ref: affiliate.link_ref,
+    caption: buildAffiliateCaption(affiliate.link_ref),
   });
 }
 
@@ -446,6 +490,61 @@ function isAffiliateCodeExists(code) {
   }
 
   return false;
+}
+
+function lookupAffiliateByWhatsApp(whatsappNorm) {
+  var sheet = getOrCreateSheet(SHEET_AFFILIATES, AFFILIATES_HEADERS);
+  ensureHeaders(sheet, AFFILIATES_HEADERS);
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return null;
+
+  var lastCol = sheet.getLastColumn();
+  var headerRow = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var whatsappCol = -1;
+  var namaCol = -1;
+  var kodeCol = -1;
+  var linkCol = -1;
+  var statusCol = -1;
+
+  for (var i = 0; i < headerRow.length; i++) {
+    var h = sanitizeText(headerRow[i]);
+    if (h === 'whatsapp') whatsappCol = i + 1;
+    if (h === 'nama') namaCol = i + 1;
+    if (h === 'kode_ref') kodeCol = i + 1;
+    if (h === 'link_ref') linkCol = i + 1;
+    if (h === 'status') statusCol = i + 1;
+  }
+
+  if (whatsappCol === -1 || kodeCol === -1) return null;
+
+  var rows = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  var lastMatch = null;
+
+  for (var r = 0; r < rows.length; r++) {
+    var rowWaNorm = normalizeWhatsApp(rows[r][whatsappCol - 1]);
+    if (rowWaNorm !== whatsappNorm) continue;
+
+    var status = statusCol > 0 ? sanitizeText(rows[r][statusCol - 1]).toLowerCase() : 'active';
+    if (status === 'inactive') continue;
+
+    var kodeRef = sanitizeText(rows[r][kodeCol - 1]).toUpperCase();
+    if (!kodeRef) continue;
+
+    var linkRef = linkCol > 0 ? sanitizeText(rows[r][linkCol - 1]) : '';
+    if (!linkRef) {
+      var baseUrl = getSetting('base_webinar_url', SETTINGS_DEFAULTS.base_webinar_url);
+      linkRef = buildAffiliateLink(baseUrl, kodeRef);
+    }
+
+    lastMatch = {
+      nama: namaCol > 0 ? sanitizeText(rows[r][namaCol - 1]) : '',
+      kode_ref: kodeRef,
+      link_ref: linkRef,
+    };
+  }
+
+  return lastMatch;
 }
 
 function lookupAffiliateByCode(refCode) {

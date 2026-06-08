@@ -220,6 +220,50 @@
   margin-bottom: 1rem;
 }
 
+.affiliate-lookup {
+  margin-bottom: 2rem;
+  padding: 1.25rem 1.375rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  max-width: 100%;
+  min-width: 0;
+}
+
+.affiliate-lookup__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 0.5rem;
+}
+
+.affiliate-lookup__copy {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--color-muted);
+  margin-bottom: 1rem;
+}
+
+.affiliate-lookup__form {
+  display: grid;
+  gap: 0.875rem;
+  max-width: 420px;
+}
+
+.affiliate-lookup__field {
+  margin-bottom: 0;
+}
+
+.affiliate-lookup__error {
+  margin-bottom: 0;
+}
+
+.affiliate-lookup__submit {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
 .affiliate-success {
   padding: 1.5rem;
   background: var(--color-white);
@@ -235,7 +279,33 @@
   font-size: 1.375rem;
   font-weight: 700;
   color: var(--color-success);
+  margin-bottom: 0.5rem;
+}
+
+.affiliate-success__greeting {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
   margin-bottom: 1rem;
+}
+
+.affiliate-success__reset {
+  margin-top: 1.25rem;
+  width: 100%;
+  min-height: 2.75rem;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.affiliate-success__reset:hover {
+  color: var(--color-brand-red);
+  border-color: var(--color-brand-red);
 }
 
 .affiliate-success__label {
