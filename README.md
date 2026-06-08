@@ -1,6 +1,6 @@
 # Landing Page Webinar TEKAD
 
-Landing page pendaftaran webinar gratis **"Dari Bingung Arah Menjadi Siap Kerja"** untuk LPK TEKAD.
+Landing page pendaftaran webinar gratis **"Dari Bingung Arah Menjadi Siap Kerja"** untuk LPK TEKAD, dengan program mitra affiliate dan referral tracking.
 
 ## Stack
 
@@ -8,6 +8,17 @@ Landing page pendaftaran webinar gratis **"Dari Bingung Arah Menjadi Siap Kerja"
 - CSS biasa (tanpa UI library berat)
 - Google Apps Script → Google Sheet
 - Hosting: Cloudflare Pages
+
+## Halaman & Route
+
+| Route | Fungsi |
+|-------|--------|
+| `/` | Landing webinar |
+| `/webinar` | Alias landing webinar |
+| `/webinar?ref=KODE` | Landing webinar + simpan referral (`tekad_ref_code`) + badge + kirim `ref_code` ke Sheet |
+| `/affiliate` | Pendaftaran mitra affiliate + link promosi |
+
+Tanpa `?ref=`, nilai referral default adalah `DIRECT`.
 
 ## Menjalankan Lokal
 
@@ -46,13 +57,14 @@ npm run dev
 
 6. Buka `http://localhost:5173` di browser.
 
-### Build Production
+### Build & Test
 
 ```bash
 npm run build
+node scripts/e2e-runtime.mjs
 ```
 
-Output ada di folder `dist/`.
+E2E membutuhkan dev server berjalan (default `http://localhost:5175`). Override dengan `E2E_BASE_URL` jika perlu.
 
 Preview build lokal:
 
@@ -60,13 +72,15 @@ Preview build lokal:
 npm run preview
 ```
 
+Output production ada di folder `dist/`.
+
 ## Environment Variables
 
 | Variable | Wajib | Keterangan |
 |----------|-------|------------|
 | `VITE_GOOGLE_SCRIPT_URL` | Ya | URL Web App Google Apps Script |
-| `VITE_WHATSAPP_REDIRECT_URL` | Ya | URL `wa.me` untuk redirect setelah submit |
 | `VITE_FORM_TOKEN` | Ya | Token rahasia, harus sama dengan `FORM_TOKEN` di Apps Script |
+| `VITE_WHATSAPP_REDIRECT_URL` | Ya | URL `wa.me` untuk redirect setelah submit webinar |
 
 **Development:** simpan di `.env.local` (tidak di-commit).
 
@@ -74,14 +88,24 @@ npm run preview
 
 ## Setup Google Sheet & Apps Script
 
-Lihat panduan lengkap di [`google-apps-script/README.md`](google-apps-script/README.md).
+Panduan lengkap: [`google-apps-script/README.md`](google-apps-script/README.md).
 
 Ringkas:
 
-1. Buat Google Sheet dengan tab **Leads**
-2. Deploy `google-apps-script/Code.gs` sebagai Web App
-3. Set Script Property `FORM_TOKEN`
-4. Salin Web App URL ke `VITE_GOOGLE_SCRIPT_URL`
+1. Buat Google Sheet dengan tab **Leads** (kolom `ref_code`, `affiliate_name` ditambahkan otomatis oleh script)
+2. Siapkan tab **affiliates** dan **settings** (script bisa membuat jika belum ada)
+3. Deploy `google-apps-script/Code.gs` sebagai Web App
+4. Set Script Property `FORM_TOKEN`
+5. Isi `base_webinar_url` di sheet **settings** (URL landing webinar production)
+6. Salin Web App URL ke `VITE_GOOGLE_SCRIPT_URL`
+
+## Alur Affiliate MVP
+
+1. Mitra daftar di `/affiliate` → dapat `kode_ref`, `link_ref`, dan caption promosi
+2. Mitra share `link_ref` (format `/webinar?ref=KODE`)
+3. Pengunjung melihat badge referral di landing
+4. Submit form webinar mengirim `ref_code` ke Google Sheet
+5. Admin validasi lead & komisi manual (di luar scope frontend)
 
 ## Deploy ke Cloudflare Pages
 
@@ -94,10 +118,12 @@ Ringkas:
    - **Build output directory:** `dist`
 5. Tambahkan environment variables:
    - `VITE_GOOGLE_SCRIPT_URL`
-   - `VITE_WHATSAPP_REDIRECT_URL`
    - `VITE_FORM_TOKEN`
+   - `VITE_WHATSAPP_REDIRECT_URL`
 6. Deploy
-7. Test submit form di URL production
+7. Uji manual `/`, `/webinar?ref=KODE`, `/affiliate`, dan submit form
+
+File `public/_redirects` (`/* /index.html 200`) memastikan route SPA berfungsi di Cloudflare Pages.
 
 ### Custom Domain (opsional)
 
@@ -111,12 +137,14 @@ Landing page menangkap query parameter:
 - `utm_source`
 - `utm_medium`
 - `utm_campaign`
+- `ref` (affiliate referral, disimpan di `localStorage` key `tekad_ref_code`)
 
 Contoh:
 
 ```
 https://your-domain.pages.dev/?source=wa_status
 https://your-domain.pages.dev/?utm_source=facebook&utm_medium=organic&utm_campaign=webinar_siap_kerja
+https://your-domain.pages.dev/webinar?ref=BIMA-4821
 ```
 
 ## Struktur Project
@@ -124,18 +152,25 @@ https://your-domain.pages.dev/?utm_source=facebook&utm_medium=organic&utm_campai
 ```
 src/
   components/
-    layout/       Header
+    layout/       Header, Footer
     sections/     Landing page sections
     form/         Typeform-style form
+  pages/          WebinarLandingPage, AffiliatePage
   hooks/          useFormState
-  lib/            tracking, validation, submit, whatsapp
-  styles/         global, landing, form CSS
+  lib/            tracking, referral, validation, submitLead, submitAffiliate, routing
+  styles/         global, landing, form, affiliate CSS
   types/          TypeScript interfaces
 google-apps-script/
-  Code.gs         Backend handler untuk Google Sheet
+  Code.gs         Backend handler untuk Google Sheet + affiliate
+public/
+  _redirects      SPA fallback untuk Cloudflare Pages
+scripts/
+  e2e-runtime.mjs Runtime E2E (webinar + affiliate + referral)
 ```
 
 ## Manual Test Checklist
+
+### Webinar
 
 - [ ] Landing page responsif (mobile & desktop)
 - [ ] CTA membuka form full-screen
@@ -143,5 +178,15 @@ google-apps-script/
 - [ ] Submit berhasil → data masuk Google Sheet
 - [ ] Redirect WhatsApp setelah sukses
 - [ ] `?source=wa_status` tercatat di sheet
+- [ ] `?ref=KODE` → badge tampil, `ref_code` masuk Sheet
+- [ ] Tanpa ref → `ref_code=DIRECT`
 - [ ] Tombol Back tidak menghapus jawaban
 - [ ] Tombol Close kembali ke landing page
+
+### Affiliate
+
+- [ ] `/affiliate` render di mobile tanpa overflow
+- [ ] Validasi form affiliate (nama, WA, kota, persetujuan)
+- [ ] Submit berhasil → kode, link, caption tampil
+- [ ] Copy Link / Copy Caption berfungsi
+- [ ] Link referral membuka webinar dengan badge

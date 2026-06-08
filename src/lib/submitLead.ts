@@ -1,4 +1,5 @@
 import type { LeadFormData, LeadPayload, SubmitResponse, TrackingData } from '../types/lead';
+import { DIRECT_REFERRAL } from './referral';
 import { normalizeWhatsApp } from './validation';
 
 export async function submitLead(
@@ -35,6 +36,7 @@ export async function submitLead(
     page_url: tracking.page_url,
     user_agent: tracking.user_agent,
     honeypot,
+    ref_code: tracking.ref_code || DIRECT_REFERRAL,
   };
 
   try {

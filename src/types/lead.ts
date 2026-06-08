@@ -16,6 +16,7 @@ export interface TrackingData {
   utm_campaign: string;
   page_url: string;
   user_agent: string;
+  ref_code?: string;
 }
 
 export interface LeadPayload extends LeadFormData {
@@ -28,6 +29,7 @@ export interface LeadPayload extends LeadFormData {
   page_url: string;
   user_agent: string;
   honeypot?: string;
+  ref_code?: string;
 }
 
 export interface SubmitResponse {

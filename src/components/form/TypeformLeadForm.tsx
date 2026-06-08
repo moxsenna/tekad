@@ -19,11 +19,12 @@ interface TypeformLeadFormProps {
   isOpen: boolean;
   onClose: () => void;
   tracking: TrackingData;
+  refCode: string;
 }
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error';
 
-export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadFormProps) {
+export function TypeformLeadForm({ isOpen, onClose, tracking, refCode }: TypeformLeadFormProps) {
   const {
     currentStep,
     formData,
@@ -67,7 +68,11 @@ export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadForm
     setSubmitMessage('Mengirim pendaftaran…');
     setError(null);
 
-    const result = await submitLead(formData, tracking, honeypot);
+    const result = await submitLead(
+      formData,
+      { ...tracking, ref_code: refCode },
+      honeypot
+    );
 
     if (result.success) {
       setSubmitStatus('success');
@@ -82,7 +87,7 @@ export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadForm
       );
       setError(result.message || 'Maaf, pendaftaran belum berhasil terkirim. Silakan coba lagi.');
     }
-  }, [formData, tracking, honeypot, setError]);
+  }, [formData, tracking, refCode, honeypot, setError]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

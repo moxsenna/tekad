@@ -537,6 +537,381 @@ async function testMobileFormLayout(page) {
   }
 }
 
+async function clearReferralStorage(page) {
+  await page.goto(BASE_URL);
+  await page.evaluate(() => localStorage.removeItem('tekad_ref_code'));
+}
+
+async function mockGasPost(page, responder) {
+  await page.route(GAS_URL, async (route) => {
+    if (route.request().method() === 'POST') {
+      let payload = null;
+      try {
+        payload = JSON.parse(route.request().postData() || '{}');
+      } catch {
+        payload = null;
+      }
+
+      const body =
+        typeof responder === 'function' ? await responder(payload, route) : responder;
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/plain',
+        body: JSON.stringify(body),
+      });
+      return;
+    }
+    await route.continue();
+  });
+}
+
+async function gotoAffiliate(page) {
+  await page.goto(`${BASE_URL}/affiliate`, { waitUntil: 'networkidle' });
+  await page.getByRole('heading', { name: 'Jadi Mitra Affiliate TEKAD' }).waitFor();
+}
+
+async function fillAffiliateRequired(page, { nama, whatsapp, kota, agreeTerms = false }) {
+  if (nama !== undefined) {
+    await page.getByPlaceholder('Contoh: Bima Senna').fill(nama);
+  }
+  if (whatsapp !== undefined) {
+    await page.getByPlaceholder('08xxxxxxxxxx').fill(whatsapp);
+  }
+  if (kota !== undefined) {
+    await page.getByPlaceholder('Contoh: Cirebon').fill(kota);
+  }
+  if (agreeTerms) {
+    await page.locator('.affiliate-consent input[type="checkbox"]').check();
+  }
+}
+
+async function submitAffiliateForm(page) {
+  await page.getByRole('button', { name: 'Daftar & Buat Link Affiliate' }).click();
+}
+
+async function affiliateErrorText(page) {
+  return (await page.locator('.affiliate-form__error').textContent()) || '';
+}
+
+const AFFILIATE_SUCCESS_MOCK = {
+  ok: true,
+  affiliate_id: 'AFF-TEST-001',
+  kode_ref: 'BIMA-4821',
+  link_ref: 'https://example.com/webinar?ref=BIMA-4821',
+  caption: 'Caption test https://example.com/webinar?ref=BIMA-4821',
+};
+
+async function testAffiliatePage(context) {
+  log('\n=== Affiliate Page Tests ===');
+
+  // A. Render page + required fields
+  const renderPage = await context.newPage();
+  await gotoAffiliate(renderPage);
+  const headlineVisible = await renderPage
+    .getByRole('heading', { name: 'Jadi Mitra Affiliate TEKAD' })
+    .isVisible();
+  const namaField = await renderPage.getByPlaceholder('Contoh: Bima Senna').isVisible();
+  const waField = await renderPage.getByPlaceholder('08xxxxxxxxxx').isVisible();
+  const kotaField = await renderPage.getByPlaceholder('Contoh: Cirebon').isVisible();
+  const consentVisible = await renderPage.locator('.affiliate-consent').isVisible();
+  record(
+    'Affiliate: page render + required fields',
+    headlineVisible && namaField && waField && kotaField && consentVisible
+  );
+
+  for (const width of [390, 414]) {
+    await renderPage.setViewportSize({ width, height: 844 });
+    await gotoAffiliate(renderPage);
+    const overflow = await assertNoHorizontalOverflow(renderPage);
+    record(
+      `Affiliate: no horizontal overflow ${width}px`,
+      overflow.ok,
+      `doc=${overflow.docWidth}, vw=${overflow.viewWidth}`
+    );
+  }
+
+  // B. Validation
+  const validationPage = await context.newPage();
+  await gotoAffiliate(validationPage);
+  await submitAffiliateForm(validationPage);
+  const namaErr = await affiliateErrorText(validationPage);
+  record('Affiliate: validation nama wajib', /Nama wajib diisi/i.test(namaErr), namaErr.trim());
+
+  await fillAffiliateRequired(validationPage, { nama: 'E2E Affiliate' });
+  await submitAffiliateForm(validationPage);
+  const waErr = await affiliateErrorText(validationPage);
+  record(
+    'Affiliate: validation WhatsApp wajib',
+    /WhatsApp wajib diisi/i.test(waErr),
+    waErr.trim()
+  );
+
+  await fillAffiliateRequired(validationPage, { whatsapp: '081234567890' });
+  await submitAffiliateForm(validationPage);
+  const kotaErr = await affiliateErrorText(validationPage);
+  record('Affiliate: validation kota wajib', /Kota wajib diisi/i.test(kotaErr), kotaErr.trim());
+
+  await fillAffiliateRequired(validationPage, { kota: 'Cirebon' });
+  await submitAffiliateForm(validationPage);
+  const termsErr = await affiliateErrorText(validationPage);
+  record(
+    'Affiliate: validation agree_terms wajib',
+    /menyetujui syarat affiliate/i.test(termsErr),
+    termsErr.trim()
+  );
+
+  await fillAffiliateRequired(validationPage, { agreeTerms: true, whatsapp: '08123' });
+  await submitAffiliateForm(validationPage);
+  const waShortErr = await affiliateErrorText(validationPage);
+  record(
+    'Affiliate: validation WhatsApp minimal 10 digit',
+    /Minimal 10 digit/i.test(waShortErr),
+    waShortErr.trim()
+  );
+
+  // C. Submit success with mock GAS
+  const successPage = await context.newPage();
+  let affiliatePayload = null;
+  await mockGasPost(successPage, (payload) => {
+    affiliatePayload = payload;
+    return AFFILIATE_SUCCESS_MOCK;
+  });
+  await gotoAffiliate(successPage);
+  await fillAffiliateRequired(successPage, {
+    nama: 'E2E Affiliate Success',
+    whatsapp: '081234567801',
+    kota: 'Cirebon',
+    agreeTerms: true,
+  });
+  await submitAffiliateForm(successPage);
+  await successPage.locator('.affiliate-success').waitFor({ state: 'visible', timeout: 5000 });
+
+  const successTitle = await successPage.locator('.affiliate-success__title').textContent();
+  const codeText = await successPage.locator('.affiliate-success__code').textContent();
+  const linkText = await successPage.locator('.affiliate-success__link-box a').textContent();
+  const copyLinkBtn = await successPage.getByRole('button', { name: 'Copy Link' }).isVisible();
+  const copyCaptionBtn = await successPage
+    .getByRole('button', { name: 'Copy Caption Promosi' })
+    .isVisible();
+
+  record(
+    'Affiliate: submit success payload',
+    affiliatePayload?.action === 'registerAffiliate' &&
+      affiliatePayload?.token === FORM_TOKEN &&
+      affiliatePayload?.nama === 'E2E Affiliate Success' &&
+      affiliatePayload?.whatsapp === '081234567801' &&
+      affiliatePayload?.kota === 'Cirebon' &&
+      affiliatePayload?.agree_terms === true,
+    `action=${affiliatePayload?.action}, agree_terms=${affiliatePayload?.agree_terms}`
+  );
+  record(
+    'Affiliate: success card content',
+    /Pendaftaran Berhasil/i.test(successTitle || '') &&
+      codeText?.trim() === 'BIMA-4821' &&
+      /BIMA-4821/.test(linkText || '') &&
+      copyLinkBtn &&
+      copyCaptionBtn,
+    `code=${codeText?.trim()}, link=${(linkText || '').trim().slice(0, 60)}`
+  );
+
+  await successPage.getByRole('button', { name: 'Copy Link' }).click();
+  await successPage.waitForTimeout(300);
+  const successStillVisible = await successPage.locator('.affiliate-success').isVisible();
+  record('Affiliate: success card persists after copy', successStillVisible);
+
+  // D. Submit error with mock GAS
+  const errorPage = await context.newPage();
+  await mockGasPost(errorPage, {
+    ok: false,
+    error: 'VALIDATION_ERROR',
+    message: 'Nomor WhatsApp wajib diisi.',
+  });
+  await gotoAffiliate(errorPage);
+  await fillAffiliateRequired(errorPage, {
+    nama: 'E2E Affiliate Error',
+    whatsapp: '081234567802',
+    kota: 'Cirebon',
+    agreeTerms: true,
+  });
+  await submitAffiliateForm(errorPage);
+  await errorPage.waitForTimeout(500);
+  const apiError = await affiliateErrorText(errorPage);
+  record(
+    'Affiliate: submit error message from GAS',
+    /Nomor WhatsApp wajib diisi/i.test(apiError),
+    apiError.trim()
+  );
+
+  // E. End-to-end referral local flow
+  const e2ePage = await context.newPage();
+  let affiliateRegisterPayload = null;
+  let leadPayload = null;
+
+  await mockGasPost(e2ePage, (payload) => {
+    if (payload.action === 'registerAffiliate') {
+      affiliateRegisterPayload = payload;
+      return {
+        ...AFFILIATE_SUCCESS_MOCK,
+        link_ref: `${BASE_URL}/webinar?ref=BIMA-4821`,
+      };
+    }
+    leadPayload = payload;
+    return { success: true, message: 'Lead saved' };
+  });
+
+  await clearReferralStorage(e2ePage);
+  await gotoAffiliate(e2ePage);
+  await fillAffiliateRequired(e2ePage, {
+    nama: 'E2E Affiliate E2E',
+    whatsapp: '081234567803',
+    kota: 'Cirebon',
+    agreeTerms: true,
+  });
+  await submitAffiliateForm(e2ePage);
+  await e2ePage.locator('.affiliate-success').waitFor({ state: 'visible', timeout: 5000 });
+
+  await e2ePage.goto(`${BASE_URL}/webinar?ref=BIMA-4821`);
+  const badgeText = (await e2ePage.locator('.referral-badge').textContent()) || '';
+  record(
+    'Affiliate E2E: referral link shows badge',
+    /Direkomendasikan oleh\s*BIMA-4821/i.test(badgeText.replace(/\s+/g, ' ').trim()),
+    badgeText.trim()
+  );
+
+  await fillFormSteps(e2ePage, { nama: 'E2E Affiliate Lead', whatsapp: '081234567804' });
+  await e2ePage.getByRole('button', { name: 'Kirim Pendaftaran' }).click();
+  await e2ePage.waitForTimeout(1500);
+
+  record(
+    'Affiliate E2E: affiliate register captured',
+    affiliateRegisterPayload?.action === 'registerAffiliate',
+    `action=${affiliateRegisterPayload?.action ?? '(missing)'}`
+  );
+  record(
+    'Affiliate E2E: lead submit includes ref_code',
+    leadPayload?.ref_code === 'BIMA-4821',
+    `ref_code=${leadPayload?.ref_code ?? '(missing)'}`
+  );
+}
+
+async function testReferralTracking(context) {
+  log('\n=== Referral Tracking Tests ===');
+
+  const badge = (page) => page.locator('.referral-badge');
+
+  // No ref + empty storage → no badge
+  const noRefPage = await context.newPage();
+  await clearReferralStorage(noRefPage);
+  await noRefPage.goto(`${BASE_URL}/webinar`);
+  const noBadgeVisible = await badge(noRefPage).isVisible().catch(() => false);
+  record('Referral: no ref no badge', !noBadgeVisible);
+
+  // ?ref=BIMA-4821 → badge visible
+  const refPage = await context.newPage();
+  await clearReferralStorage(refPage);
+  await refPage.goto(`${BASE_URL}/webinar?ref=BIMA-4821`);
+  const refBadgeText = (await badge(refPage).textContent()) || '';
+  record(
+    'Referral: ?ref=BIMA-4821 badge visible',
+    /Direkomendasikan oleh\s*BIMA-4821/i.test(refBadgeText.replace(/\s+/g, ' ').trim()),
+    refBadgeText.trim()
+  );
+
+  // Reload without query → badge persists from localStorage
+  await refPage.goto(`${BASE_URL}/webinar`);
+  const persistedText = (await badge(refPage).textContent()) || '';
+  const storedCode = await refPage.evaluate(() => localStorage.getItem('tekad_ref_code'));
+  record(
+    'Referral: reload without query persists',
+    /BIMA-4821/i.test(persistedText) && storedCode === 'BIMA-4821',
+    `badge="${persistedText.trim()}", stored=${storedCode}`
+  );
+
+  // Malicious ref → sanitized safe (no angle brackets), invalid chars → DIRECT
+  const scriptPage = await context.newPage();
+  await clearReferralStorage(scriptPage);
+  await scriptPage.goto(`${BASE_URL}/webinar?ref=%3Cscript%3E`);
+  const scriptBadgeVisible = await badge(scriptPage).isVisible().catch(() => false);
+  const scriptBadgeText = scriptBadgeVisible ? (await badge(scriptPage).textContent()) || '' : '';
+  const scriptStored = await scriptPage.evaluate(() => localStorage.getItem('tekad_ref_code'));
+  record(
+    'Referral: script ref sanitized safe',
+    !scriptBadgeText.includes('<') &&
+      !scriptBadgeText.includes('>') &&
+      (scriptStored === null || !String(scriptStored).includes('<')),
+    `badge=${scriptBadgeVisible}, stored=${scriptStored}`
+  );
+
+  const invalidPage = await context.newPage();
+  await clearReferralStorage(invalidPage);
+  await invalidPage.goto(`${BASE_URL}/webinar?ref=%3C%3E`);
+  const invalidBadge = await badge(invalidPage).isVisible().catch(() => false);
+  record('Referral: invalid ref becomes DIRECT', !invalidBadge);
+
+  // Mock GAS: submit from referral link includes ref_code
+  const payloadPage = await context.newPage();
+  let capturedPayload = null;
+  await payloadPage.route(GAS_URL, async (route) => {
+    if (route.request().method() === 'POST') {
+      try {
+        capturedPayload = JSON.parse(route.request().postData() || '{}');
+      } catch {
+        capturedPayload = null;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/plain',
+        body: JSON.stringify({ success: true, message: 'Lead saved' }),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await clearReferralStorage(payloadPage);
+  await payloadPage.goto(`${BASE_URL}/webinar?ref=BIMA-4821`);
+  await fillFormSteps(payloadPage, { nama: 'E2E Ref Payload', whatsapp: '081999999901' });
+  await payloadPage.getByRole('button', { name: 'Kirim Pendaftaran' }).click();
+  await payloadPage.waitForTimeout(1500);
+  record(
+    'Referral: submit payload includes ref_code',
+    capturedPayload?.ref_code === 'BIMA-4821',
+    `ref_code=${capturedPayload?.ref_code ?? '(missing)'}`
+  );
+
+  // Mock GAS: direct visit sends DIRECT
+  const directPayloadPage = await context.newPage();
+  let directPayload = null;
+  await directPayloadPage.route(GAS_URL, async (route) => {
+    if (route.request().method() === 'POST') {
+      try {
+        directPayload = JSON.parse(route.request().postData() || '{}');
+      } catch {
+        directPayload = null;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/plain',
+        body: JSON.stringify({ success: true, message: 'Lead saved' }),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await clearReferralStorage(directPayloadPage);
+  await directPayloadPage.goto(`${BASE_URL}/`);
+  await fillFormSteps(directPayloadPage, { nama: 'E2E Direct Ref', whatsapp: '081999999902' });
+  await directPayloadPage.getByRole('button', { name: 'Kirim Pendaftaran' }).click();
+  await directPayloadPage.waitForTimeout(1500);
+  record(
+    'Referral: no ref payload DIRECT',
+    directPayload?.ref_code === 'DIRECT',
+    `ref_code=${directPayload?.ref_code ?? '(missing)'}`
+  );
+}
+
 async function testBrowserBackPreservesData(page) {
   log('\n=== Browser Back Preserves Data ===');
   await page.goto(BASE_URL);
@@ -576,8 +951,10 @@ async function main() {
     });
     record(
       'Browser submit direct + redirect',
-      b1.submitOk && b1.capturedPayload?.source === 'direct',
-      `redirect=${b1.redirected}, source=${b1.capturedPayload?.source}, url=${b1.finalUrl.slice(0, 80)}`
+      b1.submitOk &&
+        b1.capturedPayload?.source === 'direct' &&
+        b1.capturedPayload?.ref_code === 'DIRECT',
+      `redirect=${b1.redirected}, source=${b1.capturedPayload?.source}, ref_code=${b1.capturedPayload?.ref_code}, url=${b1.finalUrl.slice(0, 80)}`
     );
 
     // Browser submit: wa_status
@@ -627,6 +1004,8 @@ async function main() {
       `redirect=${b5.redirected}, normalized=${b5.capturedPayload?.whatsapp_normalized}`
     );
 
+    await testReferralTracking(context);
+    await testAffiliatePage(context);
     await testBrowserWrongToken(await context.newPage());
     await testBrowserBackPreservesData(await context.newPage());
     await testMobileLandingOverflow(await context.newPage());
