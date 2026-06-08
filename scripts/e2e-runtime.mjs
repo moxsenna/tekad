@@ -1255,8 +1255,14 @@ async function testMetaPixelTracking(context) {
   await installFbqStub(submitPage);
   await submitPage.goto(`${BASE_URL}/v2`);
   await fillFormSteps(submitPage, { nama: 'E2E Pixel Lead', whatsapp: '081333333301' });
+
+  const submitResponsePromise = submitPage.waitForResponse(
+    (r) => r.url().includes('script.google.com/macros') && r.request().method() === 'POST',
+    { timeout: 30000 }
+  );
   await submitPage.getByRole('button', { name: 'Kirim Pendaftaran' }).click();
-  await submitPage.waitForTimeout(2000);
+  await submitResponsePromise;
+  await submitPage.locator('.form-success').waitFor({ state: 'visible', timeout: 5000 });
   const submitCalls = await getFbqCalls(submitPage);
   record('Pixel: Lead on submit success', fbqHasStandardEvent(submitCalls, 'Lead'));
   record(
