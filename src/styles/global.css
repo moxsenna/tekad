@@ -1,22 +1,27 @@
 :root {
-  --color-navy: #16324f;
-  --color-blue: #2563eb;
-  --color-teal: #14b8a6;
-  --color-yellow: #fbbf24;
-  --color-cream: #fffbeb;
-  --color-text: #111827;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
+  --color-brand-red: #e30613;
+  --color-brand-red-hover: #c00510;
+  --color-brand-red-light: rgba(227, 6, 19, 0.1);
+  --color-dark: #2c2c2c;
+  --color-dark-deep: #1a1a1a;
+  --color-navy: #2c2c2c;
+  --color-blue: #e30613;
+  --color-teal: #e30613;
+  --color-yellow: #fde8e9;
+  --color-cream: #f7f7f7;
+  --color-text: #2c2c2c;
+  --color-muted: #666666;
+  --color-border: #e0e0e0;
   --color-white: #ffffff;
-  --color-error: #dc2626;
-  --color-error-bg: #fef2f2;
+  --color-error: #e30613;
+  --color-error-bg: #fde8e9;
   --color-success: #059669;
   --color-success-bg: #ecfdf5;
   --max-width: 1120px;
   --radius: 16px;
   --radius-lg: 24px;
-  --shadow: 0 4px 24px rgba(22, 50, 79, 0.08);
-  --shadow-lg: 0 8px 40px rgba(22, 50, 79, 0.12);
+  --shadow: 0 4px 24px rgba(44, 44, 44, 0.08);
+  --shadow-lg: 0 8px 40px rgba(44, 44, 44, 0.12);
   --font: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
@@ -120,13 +125,13 @@ button {
 }
 
 .btn--primary {
-  background: var(--color-blue);
+  background: var(--color-brand-red);
   color: var(--color-white);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 14px rgba(227, 6, 19, 0.35);
 }
 
 .btn--primary:hover {
-  background: #1d4ed8;
+  background: var(--color-brand-red-hover);
 }
 
 .btn--secondary {
@@ -136,17 +141,17 @@ button {
 }
 
 .btn--secondary:hover {
-  border-color: var(--color-blue);
-  color: var(--color-blue);
+  border-color: var(--color-brand-red);
+  color: var(--color-brand-red);
 }
 
 .btn--navy {
-  background: var(--color-navy);
+  background: var(--color-dark);
   color: var(--color-white);
 }
 
 .btn--navy:hover {
-  background: #1e4268;
+  background: var(--color-dark-deep);
 }
 
 .btn--outline-white {
@@ -270,5 +275,33 @@ button {
 
 .trust-item svg {
   flex-shrink: 0;
-  color: var(--color-teal);
+  color: var(--color-brand-red);
+}
+
+.logo {
+  display: block;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo--header {
+  height: 4.5rem;
+  max-width: 220px;
+}
+
+.logo--form {
+  height: 3.25rem;
+  max-width: 180px;
+}
+
+@media (min-width: 768px) {
+  .logo--header {
+    height: 5.5rem;
+    max-width: 260px;
+  }
+
+  .logo--form {
+    height: 3.75rem;
+    max-width: 200px;
+  }
 }

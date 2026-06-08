@@ -10,6 +10,7 @@ import {
 } from '../../lib/formConfig';
 import { submitLead } from '../../lib/submitLead';
 import { redirectToWhatsApp, getWhatsAppRedirectUrl } from '../../lib/whatsapp';
+import { Logo } from '../layout/Logo';
 import { ChoiceCard } from './ChoiceCard';
 import { ProgressBar } from './ProgressBar';
 import { ReviewSummary } from './ReviewSummary';
@@ -372,7 +373,10 @@ export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadForm
   return (
     <div className="form-overlay" role="dialog" aria-modal="true" aria-label="Form pendaftaran webinar">
       <div className="form-overlay__header">
-        <span className="form-overlay__logo">LPK TEKAD — Pendaftaran Webinar</span>
+        <div className="form-overlay__logo">
+          <Logo className="logo--form" />
+          <span className="form-overlay__logo-text">Pendaftaran Webinar</span>
+        </div>
         <button
           type="button"
           className="form-overlay__close"

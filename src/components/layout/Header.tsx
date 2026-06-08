@@ -1,3 +1,5 @@
+import { Logo } from './Logo';
+
 interface HeaderProps {
   onOpenForm: () => void;
 }
@@ -6,8 +8,8 @@ export function Header({ onOpenForm }: HeaderProps) {
   return (
     <header className="header">
       <div className="container header__inner">
-        <a href="#" className="header__logo">
-          LPK TEKAD
+        <a href="#" className="header__logo" aria-label="TEKAD — Talent Digital Academy">
+          <Logo className="logo--header" />
         </a>
         <nav className="header__nav" aria-label="Navigasi utama">
           <a href="#manfaat">Manfaat</a>
