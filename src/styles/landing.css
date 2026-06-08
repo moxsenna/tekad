@@ -20,7 +20,16 @@
 .header__logo {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .header__inner .btn--sm {
+    flex-shrink: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
 }
 
 .header__nav {
@@ -280,6 +289,19 @@
   font-weight: 600;
   white-space: nowrap;
   padding: 0.25rem 0.5rem;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .trust-strip__inner {
+    gap: 0.375rem 0.5rem;
+  }
+
+  .trust-strip__badge {
+    white-space: normal;
+    text-align: center;
+    justify-content: center;
+  }
 }
 
 .trust-strip__dot {
@@ -300,7 +322,11 @@
 /* ── Problem cards ── */
 .problem-grid {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 0.875rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .problem-card {
@@ -312,6 +338,10 @@
   border-radius: var(--radius);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .problem-card__icon {
@@ -326,17 +356,24 @@
   color: var(--color-brand-red);
 }
 
+.problem-card > div:not(.problem-card__icon) {
+  flex: 1;
+  min-width: 0;
+}
+
 .problem-card__title {
   font-size: 1rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
   color: var(--color-dark);
+  overflow-wrap: break-word;
 }
 
 .problem-card__text {
   font-size: 0.9375rem;
   color: var(--color-muted);
   line-height: 1.45;
+  overflow-wrap: break-word;
 }
 
 @media (min-width: 640px) {
@@ -456,9 +493,9 @@
   display: none;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .roadmap__steps {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     max-width: none;
     gap: 1rem;
   }
@@ -494,7 +531,11 @@
 /* ── Benefit checklist ── */
 .benefit-checklist {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 0.875rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .benefit-checklist__item {
@@ -506,6 +547,10 @@
   border-radius: var(--radius);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .benefit-checklist__icon {
@@ -518,6 +563,8 @@
   font-size: 1rem;
   line-height: 1.45;
   font-weight: 500;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 @media (min-width: 640px) {
@@ -536,7 +583,11 @@
 .audience-checklist {
   list-style: none;
   display: grid;
+  grid-template-columns: 1fr;
   gap: 0.625rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .audience-checklist__item {
@@ -546,6 +597,8 @@
   font-size: 1rem;
   line-height: 1.45;
   padding: 0.625rem 0;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 .audience-checklist__icon {
@@ -564,7 +617,11 @@
 /* ── Material blocks ── */
 .material-blocks {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .material-block {
@@ -575,6 +632,10 @@
   border-radius: var(--radius);
   border-left: 4px solid var(--color-brand-red);
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .material-block__num {
@@ -598,10 +659,16 @@
   color: var(--color-dark);
 }
 
+.material-block > div:not(.material-block__num) {
+  flex: 1;
+  min-width: 0;
+}
+
 .material-block__text {
   font-size: 0.9375rem;
   color: var(--color-muted);
   line-height: 1.45;
+  overflow-wrap: break-word;
 }
 
 .material-note {
@@ -617,7 +684,11 @@
 /* ── After register timeline ── */
 .timeline {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .timeline__item {
@@ -628,6 +699,10 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .timeline__marker {
@@ -666,10 +741,16 @@
   color: var(--color-dark);
 }
 
+.timeline__content {
+  flex: 1;
+  min-width: 0;
+}
+
 .timeline__text {
   font-size: 0.9375rem;
   color: var(--color-muted);
   line-height: 1.45;
+  overflow-wrap: break-word;
 }
 
 .after-register-note {
@@ -685,7 +766,7 @@
 /* ── Trust cards (TEKAD section) ── */
 .trust-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem 1.125rem;
   background: var(--color-white);
@@ -693,22 +774,43 @@
   border-radius: var(--radius);
   font-size: 0.9375rem;
   font-weight: 600;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .trust-card svg {
   flex-shrink: 0;
   color: var(--color-brand-red);
+  margin-top: 0.125rem;
+}
+
+.trust-card span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  line-height: 1.4;
 }
 
 .trust-grid {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 640px) {
   .trust-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .trust-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -847,5 +949,39 @@
 @media (max-width: 767px) {
   .section {
     padding: 2.5rem 0;
+  }
+}
+
+/* ── Mobile overflow guards ── */
+@media (max-width: 640px) {
+  .hero__grid,
+  .roadmap__grid,
+  .roadmap__aside,
+  .event-card,
+  .cta-section,
+  .disclaimer-card,
+  .sticky-cta {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .problem-grid,
+  .benefit-checklist,
+  .audience-checklist,
+  .material-blocks,
+  .timeline,
+  .roadmap__steps,
+  .trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .problem-card__text,
+  .roadmap__step-text,
+  .section__subtitle,
+  .section__title,
+  .event-card__item span {
+    overflow-wrap: break-word;
+    min-width: 0;
   }
 }

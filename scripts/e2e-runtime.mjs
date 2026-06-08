@@ -333,8 +333,31 @@ async function testBrowserWrongToken(page) {
 async function assertNoHorizontalOverflow(page) {
   return page.evaluate(() => {
     const docWidth = document.documentElement.scrollWidth;
+    const bodyWidth = document.body.scrollWidth;
     const viewWidth = window.innerWidth;
-    return { docWidth, viewWidth, ok: docWidth <= viewWidth + 1 };
+    const ok = docWidth <= viewWidth + 1 && bodyWidth <= viewWidth + 1;
+    return { docWidth, bodyWidth, viewWidth, ok };
+  });
+}
+
+async function findOverflowOffenders(page) {
+  return page.evaluate(() => {
+    const vw = window.innerWidth;
+    const offenders = [];
+    for (const el of document.querySelectorAll('body *')) {
+      const rect = el.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) continue;
+      if (rect.right > vw + 1) {
+        offenders.push({
+          tag: el.tagName,
+          className: String(el.className || '').slice(0, 100),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          text: (el.textContent || '').trim().slice(0, 60),
+        });
+      }
+    }
+    return offenders.slice(0, 5);
   });
 }
 
@@ -352,6 +375,115 @@ async function assertButtonInViewport(page, name) {
     ok,
     detail: `x=${Math.round(box.x)} w=${Math.round(box.width)} viewport=${viewWidth}x${viewHeight}`,
   };
+}
+
+async function testMobileLandingOverflow(page) {
+  log('\n=== Mobile Landing Overflow Tests ===');
+
+  const viewports = [
+    { width: 320, height: 678 },
+    { width: 360, height: 740 },
+    { width: 390, height: 844 },
+    { width: 414, height: 896 },
+  ];
+
+  for (const vp of viewports) {
+    await page.setViewportSize(vp);
+    await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+
+    const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    const scrollPositions = [
+      0,
+      Math.floor(scrollHeight * 0.25),
+      Math.floor(scrollHeight * 0.5),
+      Math.floor(scrollHeight * 0.75),
+      Math.max(0, scrollHeight - vp.height),
+    ];
+
+    for (const y of scrollPositions) {
+      await page.evaluate((scrollY) => window.scrollTo(0, scrollY), y);
+      await page.waitForTimeout(120);
+
+      const overflow = await assertNoHorizontalOverflow(page);
+      const offenders = overflow.ok ? [] : await findOverflowOffenders(page);
+      const offenderDetail = offenders
+        .map((o) => `${o.tag}.${o.className} right=${o.right} "${o.text}"`)
+        .join(' | ');
+
+      record(
+        `Landing ${vp.width}x${vp.height} scroll@${y}: no overflow`,
+        overflow.ok && offenders.length === 0,
+        overflow.ok
+          ? `doc=${overflow.docWidth}, body=${overflow.bodyWidth}, vw=${overflow.viewWidth}`
+          : offenderDetail || `doc=${overflow.docWidth}, body=${overflow.bodyWidth}, vw=${overflow.viewWidth}`
+      );
+    }
+
+    await page.evaluate(() => {
+      document.getElementById('tentang')?.scrollIntoView({ block: 'center' });
+    });
+    await page.waitForTimeout(150);
+
+    const tekadGrid = await page.evaluate(() => {
+      const grid = document.querySelector('#tentang .trust-grid');
+      if (!grid) return { columns: null, singleColumn: false };
+      const columns = getComputedStyle(grid).gridTemplateColumns;
+      const trackCount = columns.split(' ').filter(Boolean).length;
+      return { columns, singleColumn: trackCount === 1 };
+    });
+    record(
+      `Landing ${vp.width}x${vp.height}: TEKAD trust cards single column`,
+      tekadGrid.singleColumn,
+      `columns=${tekadGrid.columns}`
+    );
+
+    const tekadOffenders = await findOverflowOffenders(page);
+    record(
+      `Landing ${vp.width}x${vp.height}: TEKAD section no element overflow`,
+      tekadOffenders.length === 0,
+      tekadOffenders.map((o) => `${o.className} right=${o.right}`).join(' | ') || 'none'
+    );
+
+    await openForm(page);
+    const formOverflow = await assertNoHorizontalOverflow(page);
+    record(
+      `Landing ${vp.width}x${vp.height}: form open no overflow`,
+      formOverflow.ok,
+      `doc=${formOverflow.docWidth}, vw=${formOverflow.viewWidth}`
+    );
+
+    await form(page).getByRole('button', { name: 'Mulai Daftar' }).click();
+    await form(page).getByPlaceholder('Contoh: Ibu Siti / Bapak Ahmad').fill('E2E Overflow');
+    await form(page).getByRole('button', { name: 'Lanjut' }).click();
+
+    const formStepOverflow = await assertNoHorizontalOverflow(page);
+    record(
+      `Landing ${vp.width}x${vp.height}: form step 2 no overflow`,
+      formStepOverflow.ok,
+      `doc=${formStepOverflow.docWidth}, vw=${formStepOverflow.viewWidth}`
+    );
+
+    await form(page).getByRole('button', { name: 'Tutup form' }).click();
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(150);
+
+    const sticky = page.locator('.sticky-cta');
+    const stickyVisible = await sticky.isVisible().catch(() => false);
+    const footer = page.locator('.footer');
+    const footerBox = await footer.boundingBox();
+    const stickyBox = stickyVisible ? await sticky.boundingBox() : null;
+    const footerCovered =
+      stickyVisible &&
+      footerBox &&
+      stickyBox &&
+      stickyBox.y < footerBox.y + footerBox.height - 8;
+
+    record(
+      `Landing ${vp.width}x${vp.height}: sticky CTA not covering footer content`,
+      !footerCovered,
+      `sticky=${stickyVisible}, footerBottom=${footerBox ? Math.round(footerBox.y + footerBox.height) : 'n/a'}`
+    );
+  }
 }
 
 async function testMobileFormLayout(page) {
@@ -497,6 +629,7 @@ async function main() {
 
     await testBrowserWrongToken(await context.newPage());
     await testBrowserBackPreservesData(await context.newPage());
+    await testMobileLandingOverflow(await context.newPage());
     await testMobileFormLayout(await context.newPage());
   } finally {
     await browser.close();

@@ -80,10 +80,13 @@ button {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 1.25rem;
+  min-width: 0;
 }
 
 .section {
   padding: 4rem 0;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .section--cream {
@@ -129,6 +132,15 @@ button {
   border-radius: 999px;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
   white-space: nowrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .btn:active {
@@ -285,7 +297,16 @@ button {
 .trust-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .trust-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  }
 }
 
 .trust-item {

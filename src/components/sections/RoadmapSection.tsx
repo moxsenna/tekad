@@ -50,10 +50,10 @@ export function RoadmapSection({ onOpenForm }: RoadmapSectionProps) {
             <figure className="roadmap__visual">
               <img
                 src="/roadmap-anak-siap-kerja.webp"
-                alt="Infografis roadmap anak dari bingung arah, keterampilan digital, portofolio, hingga lebih siap kerja"
+                alt="Roadmap Karir Digital Anakmu: 4 langkah dari Bingung Arah, Skill Digital, Portofolio, hingga Lebih Siap Kerja"
                 className="roadmap__image"
-                width={600}
-                height={900}
+                width={540}
+                height={960}
                 loading="lazy"
               />
             </figure>
