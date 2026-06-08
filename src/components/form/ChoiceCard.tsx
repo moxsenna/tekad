@@ -13,7 +13,7 @@ export function ChoiceCard({ label, selected, onSelect }: ChoiceCardProps) {
       aria-pressed={selected}
     >
       <span className="choice-card__radio" aria-hidden="true" />
-      {label}
+      <span className="choice-card__label">{label}</span>
     </button>
   );
 }

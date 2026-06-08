@@ -1,29 +1,54 @@
-import { HelpCircle } from 'lucide-react';
+import { Briefcase, HelpCircle, Smartphone, GraduationCap, HeartHandshake } from 'lucide-react';
 
 const problems = [
-  'Anak sudah mau lulus, tapi belum tahu mau ke mana.',
-  'Anak ingin kerja, tapi belum punya skill dan portofolio.',
-  'Anak sering memakai HP, tapi belum diarahkan menjadi produktif.',
-  'Orang tua ingin membantu, tapi bingung harus mulai dari mana.',
-  'Kuliah penting, tapi skill kerja praktis juga perlu disiapkan.',
+  {
+    icon: HelpCircle,
+    title: 'Belum tahu arah',
+    text: 'Anak mau lulus, tapi belum tahu mau ke mana.',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Gap year / tidak lolos PTN',
+    text: 'Tidak lolos PTN atau sedang gap year dan masih mencari jalan.',
+  },
+  {
+    icon: Smartphone,
+    title: 'HP belum produktif',
+    text: 'Sering memakai HP, tapi belum diarahkan menjadi produktif.',
+  },
+  {
+    icon: Briefcase,
+    title: 'Belum punya skill',
+    text: 'Ingin kerja, tapi belum punya skill dan portofolio.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Orang tua bingung mendampingi',
+    text: 'Ingin membantu, tapi takut salah mendampingi.',
+  },
 ];
 
 export function ProblemSection() {
   return (
     <section className="section section--cream" id="masalah">
       <div className="container">
-        <h2 className="section__title">Apakah Bapak/Ibu Pernah Merasakan Ini?</h2>
-        <p className="section__subtitle">
-          Banyak anak bukan tidak mampu, mereka hanya belum punya arah. Setelah lulus sekolah
-          atau kuliah, banyak anak masih bingung harus mulai dari mana.
+        <h2 className="section__title">
+          Banyak Anak Bukan Tidak Mampu, Mereka Hanya Belum Punya Arah
+        </h2>
+        <p className="section__subtitle section__subtitle--narrow">
+          Setelah lulus sekolah atau kuliah, banyak anak belum langsung tahu jalan terbaiknya. Orang
+          tua ingin membantu, tetapi sering bingung harus mulai dari mana.
         </p>
-        <div className="problem-list">
-          {problems.map((text) => (
-            <div key={text} className="problem-item">
-              <div className="problem-item__icon">
-                <HelpCircle size={20} />
+        <div className="problem-grid">
+          {problems.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="problem-card">
+              <div className="problem-card__icon">
+                <Icon size={20} />
               </div>
-              <p>{text}</p>
+              <div>
+                <h3 className="problem-card__title">{title}</h3>
+                <p className="problem-card__text">{text}</p>
+              </div>
             </div>
           ))}
         </div>

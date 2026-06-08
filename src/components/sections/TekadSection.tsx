@@ -1,27 +1,29 @@
-import { Award, BookOpen, Briefcase, Users } from 'lucide-react';
+import { Award, BookOpen, Briefcase, Cpu, FileCheck, Users } from 'lucide-react';
 
-const trustItems = [
-  { icon: BookOpen, text: 'Fokus praktik langsung' },
-  { icon: Users, text: 'Mentor/instruktur praktisi' },
-  { icon: Briefcase, text: 'Kurikulum digital marketing dan AI' },
-  { icon: Award, text: 'Portofolio nyata & sertifikat' },
+const trustCards = [
+  { icon: Cpu, text: 'Digital Marketing & AI' },
+  { icon: BookOpen, text: 'Praktik Langsung' },
+  { icon: Users, text: 'Mentor/Instruktur' },
+  { icon: Briefcase, text: 'Portofolio Nyata' },
+  { icon: Award, text: 'Sertifikat' },
+  { icon: FileCheck, text: 'Career/Business Orientation' },
 ];
 
 export function TekadSection() {
   return (
-    <section className="section">
+    <section className="section section--cream" id="tentang">
       <div className="container">
         <h2 className="section__title">Tentang LPK TEKAD</h2>
-        <p className="section__subtitle">
+        <p className="section__subtitle section__subtitle--narrow">
           LPK TEKAD adalah lembaga pelatihan yang berfokus pada penguatan keterampilan bisnis,
-          digital marketing, AI, social media marketing, dan content creation. Program TEKAD
-          mengutamakan praktik langsung, pendampingan, portofolio nyata, sertifikat, serta
-          orientasi karir dan bisnis.
+          digital marketing, AI, social media marketing, dan content creation. Pembelajaran
+          menekankan praktik langsung, pendampingan, portofolio nyata, sertifikat, serta orientasi
+          karir dan bisnis.
         </p>
         <div className="trust-grid">
-          {trustItems.map(({ icon: Icon, text }) => (
-            <div key={text} className="trust-item">
-              <Icon size={22} />
+          {trustCards.map(({ icon: Icon, text }) => (
+            <div key={text} className="trust-card">
+              <Icon size={20} aria-hidden="true" />
               <span>{text}</span>
             </div>
           ))}

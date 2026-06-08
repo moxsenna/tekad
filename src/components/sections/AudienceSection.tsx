@@ -1,12 +1,14 @@
+import { Check } from 'lucide-react';
+
 const audienceItems = [
-  'Kelas 11 atau 12 SMA/SMK',
-  'Baru lulus SMA/SMK',
+  'Kelas 11/12 SMA atau SMK',
+  'Baru lulus sekolah',
   'Sedang gap year',
-  'Tidak lulus PTN dan sedang mencari arah',
+  'Tidak lolos PTN dan sedang mencari arah',
   'Mahasiswa yang belum punya skill kerja',
   'Fresh graduate yang belum bekerja',
-  'Suka HP/media sosial tapi belum produktif',
-  'Ingin belajar digital, AI, konten, marketing, atau bisnis online',
+  'Suka HP, media sosial, desain, video, teknologi, atau AI',
+  'Belum terlihat minatnya, tetapi ingin mulai diarahkan',
 ];
 
 export function AudienceSection() {
@@ -14,13 +16,14 @@ export function AudienceSection() {
     <section className="section" id="untuk-siapa">
       <div className="container">
         <h2 className="section__title">Webinar Ini Cocok untuk Orang Tua yang Memiliki Anak:</h2>
-        <div className="audience-tags">
+        <ul className="audience-checklist">
           {audienceItems.map((item) => (
-            <span key={item} className="audience-tag">
-              {item}
-            </span>
+            <li key={item} className="audience-checklist__item">
+              <Check size={18} className="audience-checklist__icon" aria-hidden="true" />
+              <span>{item}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

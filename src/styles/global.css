@@ -8,7 +8,8 @@
   --color-blue: #e30613;
   --color-teal: #e30613;
   --color-yellow: #fde8e9;
-  --color-cream: #f7f7f7;
+  --color-cream: #faf8f6;
+  --color-warm-bg: #fffaf8;
   --color-text: #2c2c2c;
   --color-muted: #666666;
   --color-border: #e0e0e0;
@@ -33,20 +34,30 @@
   padding: 0;
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font);
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.6;
   color: var(--color-text);
   background: var(--color-white);
   -webkit-font-smoothing: antialiased;
 }
 
-img {
+img,
+svg,
+video {
   max-width: 100%;
   height: auto;
   display: block;
@@ -85,7 +96,7 @@ button {
 }
 
 .section__title {
-  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-size: clamp(1.375rem, 4.5vw, 1.875rem);
   font-weight: 700;
   line-height: 1.3;
   margin-bottom: 1rem;
@@ -168,6 +179,18 @@ button {
 .btn--sm {
   padding: 0.5rem 1.25rem;
   font-size: 0.875rem;
+}
+
+.btn--lg {
+  padding: 1rem 2rem;
+  font-size: 1.0625rem;
+  width: 100%;
+}
+
+@media (min-width: 480px) {
+  .btn--lg {
+    width: auto;
+  }
 }
 
 .card-list {
@@ -285,8 +308,8 @@ button {
 }
 
 .logo--header {
-  height: 4.5rem;
-  max-width: 220px;
+  height: 5.25rem;
+  max-width: 250px;
 }
 
 .logo--form {
@@ -296,8 +319,8 @@ button {
 
 @media (min-width: 768px) {
   .logo--header {
-    height: 5.5rem;
-    max-width: 260px;
+    height: 8rem;
+    max-width: 380px;
   }
 
   .logo--form {

@@ -330,6 +330,81 @@ async function testBrowserWrongToken(page) {
   );
 }
 
+async function assertNoHorizontalOverflow(page) {
+  return page.evaluate(() => {
+    const docWidth = document.documentElement.scrollWidth;
+    const viewWidth = window.innerWidth;
+    return { docWidth, viewWidth, ok: docWidth <= viewWidth + 1 };
+  });
+}
+
+async function assertButtonInViewport(page, name) {
+  const box = await form(page).getByRole('button', { name }).boundingBox();
+  if (!box) return { ok: false, detail: 'button not found' };
+  const viewWidth = await page.evaluate(() => window.innerWidth);
+  const viewHeight = await page.evaluate(() => window.innerHeight);
+  const ok =
+    box.x >= -1 &&
+    box.y >= -1 &&
+    box.x + box.width <= viewWidth + 1 &&
+    box.y + box.height <= viewHeight + 1;
+  return {
+    ok,
+    detail: `x=${Math.round(box.x)} w=${Math.round(box.width)} viewport=${viewWidth}x${viewHeight}`,
+  };
+}
+
+async function testMobileFormLayout(page) {
+  log('\n=== Mobile Form Layout Tests ===');
+
+  const viewports = [
+    { width: 320, height: 678 },
+    { width: 360, height: 740 },
+    { width: 390, height: 844 },
+    { width: 414, height: 896 },
+  ];
+
+  for (const vp of viewports) {
+    await page.setViewportSize(vp);
+    await page.goto(BASE_URL);
+    await openForm(page);
+
+    const overflow = await assertNoHorizontalOverflow(page);
+    record(
+      `Mobile ${vp.width}x${vp.height}: no horizontal overflow`,
+      overflow.ok,
+      `scrollWidth=${overflow.docWidth}, innerWidth=${overflow.viewWidth}`
+    );
+
+    const mulai = await assertButtonInViewport(page, 'Mulai Daftar');
+    record(
+      `Mobile ${vp.width}x${vp.height}: Mulai Daftar in viewport`,
+      mulai.ok,
+      mulai.detail
+    );
+
+    const stickyVisible = await page.locator('.sticky-cta').isVisible().catch(() => false);
+    record(
+      `Mobile ${vp.width}x${vp.height}: sticky CTA hidden when form open`,
+      !stickyVisible,
+      `visible=${stickyVisible}`
+    );
+
+    await form(page).getByRole('button', { name: 'Mulai Daftar' }).click();
+    await form(page).getByPlaceholder('Contoh: Ibu Siti / Bapak Ahmad').fill('E2E Mobile');
+    await form(page).getByRole('button', { name: 'Lanjut' }).click();
+
+    const overflowStep2 = await assertNoHorizontalOverflow(page);
+    record(
+      `Mobile ${vp.width}x${vp.height}: no overflow after step 2`,
+      overflowStep2.ok,
+      `scrollWidth=${overflowStep2.docWidth}, innerWidth=${overflowStep2.viewWidth}`
+    );
+
+    await form(page).getByRole('button', { name: 'Tutup form' }).click();
+  }
+}
+
 async function testBrowserBackPreservesData(page) {
   log('\n=== Browser Back Preserves Data ===');
   await page.goto(BASE_URL);
@@ -422,6 +497,7 @@ async function main() {
 
     await testBrowserWrongToken(await context.newPage());
     await testBrowserBackPreservesData(await context.newPage());
+    await testMobileFormLayout(await context.newPage());
   } finally {
     await browser.close();
   }

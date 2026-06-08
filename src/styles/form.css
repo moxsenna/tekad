@@ -1,7 +1,14 @@
+/* ── Form overlay shell ── */
 .form-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
+  width: 100vw;
+  max-width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
   background: linear-gradient(160deg, #fafafa 0%, var(--color-cream) 40%, #ffffff 100%);
   display: flex;
   flex-direction: column;
@@ -17,27 +24,46 @@
   }
 }
 
+/* ── Header ── */
 .form-overlay__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
   flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .form-overlay__logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .form-overlay__logo-text {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
+  .form-overlay__header {
+    padding: 1rem 1.25rem;
+  }
+
+  .form-overlay__logo {
+    gap: 0.75rem;
+  }
+
   .form-overlay__logo-text {
     font-size: 0.9375rem;
   }
@@ -47,8 +73,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
   border-radius: 50%;
   color: var(--color-muted);
   transition: background 0.15s, color 0.15s;
@@ -59,31 +87,55 @@
   color: var(--color-text);
 }
 
+/* ── Progress ── */
 .form-progress {
+  width: 100%;
+  max-width: 100%;
   height: 4px;
   background: var(--color-border);
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .form-progress__bar {
   height: 100%;
+  max-width: 100%;
   background: linear-gradient(90deg, var(--color-brand-red), #ff4d4d);
   border-radius: 0 2px 2px 0;
   transition: width 0.4s ease;
 }
 
+/* ── Scrollable content ── */
 .form-overlay__body {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem 1.25rem 6rem;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 4.5rem 1.25rem 7.5rem;
   overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
+@media (min-width: 768px) {
+  .form-overlay__body {
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1.25rem 6rem;
+  }
+}
+
+/* ── Step content ── */
 .form-step {
   width: 100%;
   max-width: 560px;
+  min-width: 0;
+  margin: 0 auto;
   animation: stepSlideIn 0.3s ease;
 }
 
@@ -99,33 +151,44 @@
 }
 
 .form-step__counter {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-brand-red);
   margin-bottom: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  overflow-wrap: anywhere;
 }
 
 .form-step__title {
-  font-size: clamp(1.375rem, 4vw, 1.75rem);
+  font-size: clamp(1.55rem, 7vw, 2.25rem);
   font-weight: 700;
   line-height: 1.3;
   color: var(--color-navy);
   margin-bottom: 0.5rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .form-step__helper {
-  font-size: 0.9375rem;
+  font-size: clamp(1rem, 4vw, 1.125rem);
   color: var(--color-muted);
   margin-bottom: 1.5rem;
   line-height: 1.5;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
+/* ── Inputs ── */
 .form-input {
   width: 100%;
-  padding: 1rem 1.25rem;
-  font-size: 1.125rem;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
   font-family: inherit;
   border: 2px solid var(--color-border);
   border-radius: var(--radius);
@@ -133,6 +196,13 @@
   color: var(--color-text);
   transition: border-color 0.15s, box-shadow 0.15s;
   outline: none;
+}
+
+@media (min-width: 480px) {
+  .form-input {
+    padding: 1rem 1.25rem;
+    font-size: 1.125rem;
+  }
 }
 
 .form-input:focus {
@@ -156,6 +226,8 @@
   color: var(--color-error);
   border-radius: 8px;
   font-size: 0.875rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .form-success {
@@ -165,28 +237,47 @@
   color: var(--color-success);
   border-radius: 8px;
   font-size: 0.875rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
+/* ── Choice cards ── */
 .choice-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .choice-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
-  padding: 1rem 1.25rem;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.875rem 1rem;
   text-align: left;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 500;
+  line-height: 1.4;
   color: var(--color-text);
   background: var(--color-white);
   border: 2px solid var(--color-border);
   border-radius: var(--radius);
   transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
   cursor: pointer;
+  box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+  .choice-card {
+    align-items: center;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+  }
 }
 
 .choice-card:hover {
@@ -205,11 +296,19 @@
   height: 1.25rem;
   border-radius: 50%;
   border: 2px solid var(--color-border);
-  margin-right: 1rem;
+  margin-right: 0.75rem;
+  margin-top: 0.125rem;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: border-color 0.15s;
+}
+
+@media (min-width: 480px) {
+  .choice-card__radio {
+    margin-right: 1rem;
+    margin-top: 0;
+  }
 }
 
 .choice-card--selected .choice-card__radio {
@@ -224,22 +323,41 @@
   background: var(--color-brand-red);
 }
 
+.choice-card__label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* ── Review summary ── */
 .review-summary {
   background: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   overflow: hidden;
   margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .review-summary__row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 0.875rem 1.25rem;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
   border-bottom: 1px solid var(--color-border);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+@media (min-width: 480px) {
+  .review-summary__row {
+    gap: 1rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9375rem;
+  }
 }
 
 .review-summary__row:last-child {
@@ -249,11 +367,16 @@
 .review-summary__label {
   color: var(--color-muted);
   flex-shrink: 0;
+  max-width: 40%;
 }
 
 .review-summary__value {
   font-weight: 500;
   text-align: right;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .form-consent {
@@ -264,29 +387,80 @@
   padding: 0.875rem 1rem;
   background: var(--color-brand-red-light);
   border-radius: 8px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
+/* ── Footer actions ── */
 .form-overlay__footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.95);
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.875rem 1.25rem;
+  padding-bottom: calc(0.875rem + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(8px);
   border-top: 1px solid var(--color-border);
   display: flex;
-  gap: 0.75rem;
-  z-index: 210;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .form-overlay__footer .btn {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  width: auto;
+  white-space: normal;
+  text-align: center;
+  padding: 0.75rem 0.625rem;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+  .form-overlay__footer {
+    padding: 1rem 1.25rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.75rem;
+  }
+
+  .form-overlay__footer .btn {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+.form-overlay__footer--single .btn {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+.form-overlay__footer--double .btn--primary {
+  flex: 1.4 1 0;
+}
+
+.form-overlay__footer--double .btn--secondary-text {
+  flex: 0.8 1 0;
+}
+
+.form-overlay__footer--triple {
+  flex-wrap: wrap;
+}
+
+.form-overlay__footer--triple .btn--primary {
+  flex: 1 1 100%;
+  order: 3;
+}
+
+.form-overlay__footer--triple .btn--secondary-text {
+  flex: 1 1 calc(50% - 0.25rem);
+  order: 1;
 }
 
 .form-overlay__footer .btn--secondary-text {
-  flex: 0 0 auto;
-  padding: 0.875rem 1rem;
   color: var(--color-muted);
   font-weight: 500;
 }
@@ -307,6 +481,7 @@
   border-top-color: var(--color-white);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin {

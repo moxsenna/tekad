@@ -303,7 +303,7 @@ export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadForm
 
     if (currentStep === 'welcome') {
       return (
-        <div className="form-overlay__footer">
+        <div className="form-overlay__footer form-overlay__footer--single">
           <button type="button" className="btn btn--primary" onClick={goNext}>
             Mulai Daftar
           </button>
@@ -313,7 +313,7 @@ export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadForm
 
     if (currentStep === 'kekhawatiran_utama') {
       return (
-        <div className="form-overlay__footer">
+        <div className="form-overlay__footer form-overlay__footer--triple">
           {showBack && (
             <button type="button" className="btn btn--secondary-text" onClick={goBack}>
               Kembali
@@ -331,7 +331,7 @@ export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadForm
 
     if (currentStep === 'review') {
       return (
-        <div className="form-overlay__footer">
+        <div className="form-overlay__footer form-overlay__footer--double">
           {showBack && (
             <button type="button" className="btn btn--secondary-text" onClick={goBack}>
               Kembali
@@ -357,7 +357,9 @@ export function TypeformLeadForm({ isOpen, onClose, tracking }: TypeformLeadForm
     }
 
     return (
-      <div className="form-overlay__footer">
+      <div
+        className={`form-overlay__footer form-overlay__footer--double${showBack ? '' : ' form-overlay__footer--single'}`}
+      >
         {showBack && (
           <button type="button" className="btn btn--secondary-text" onClick={goBack}>
             Kembali

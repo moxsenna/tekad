@@ -13,8 +13,8 @@ export function Header({ onOpenForm }: HeaderProps) {
         </a>
         <nav className="header__nav" aria-label="Navigasi utama">
           <a href="#manfaat">Manfaat</a>
-          <a href="#untuk-siapa">Untuk Siapa</a>
-          <a href="#materi">Materi</a>
+          <a href="#alur">Alur</a>
+          <a href="#tentang">Tentang</a>
           <a href="#daftar">Daftar</a>
         </nav>
         <button type="button" className="btn btn--primary btn--sm" onClick={onOpenForm}>
