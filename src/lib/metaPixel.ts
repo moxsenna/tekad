@@ -23,7 +23,6 @@ declare global {
 
 let initialized = false;
 let scriptInjected = false;
-const trackedLandingKeys = new Set<string>();
 
 function safeFbq(...args: unknown[]): void {
   if (typeof window === 'undefined') return;
@@ -66,6 +65,7 @@ export function initMetaPixel(pixelId: string = META_PIXEL_ID): void {
   }
 
   safeFbq('init', pixelId);
+  trackPageView();
   initialized = true;
 }
 
@@ -94,11 +94,6 @@ export function trackCustom(eventName: string, params?: Record<string, unknown>)
 }
 
 export function trackLandingPageView(lpVariant: LpVariant): void {
-  const key = `${lpVariant}:${window.location.pathname}`;
-  if (trackedLandingKeys.has(key)) return;
-  trackedLandingKeys.add(key);
-
-  trackPageView();
   trackViewContent({
     content_name:
       lpVariant === 'v2'
