@@ -1,3 +1,5 @@
+import { getAppRoute } from '../../lib/routing';
+
 function formatPhoneDisplay(phone: string): string {
   let digits = phone.replace(/\D/g, '');
   if (digits.startsWith('62')) {
@@ -14,12 +16,14 @@ function formatPhoneDisplay(phone: string): string {
 export function Footer() {
   const adminPhone = (import.meta.env.VITE_WHATSAPP_ADMIN_PHONE || '6285117259331').replace(/\D/g, '');
   const waDisplay = formatPhoneDisplay(adminPhone);
+  const route = getAppRoute();
+  const tagline = route === 'affiliate' ? 'Program Mitra Affiliate' : 'Webinar Gratis untuk Orang Tua';
 
   return (
     <footer className="footer">
       <div className="container footer__inner">
         <p className="footer__brand">LPK TEKAD</p>
-        <p className="footer__tagline">Webinar Gratis untuk Orang Tua</p>
+        <p className="footer__tagline">{tagline}</p>
         {waDisplay && (
           <p className="footer__whatsapp">
             WhatsApp:{' '}

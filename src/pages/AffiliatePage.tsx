@@ -76,6 +76,9 @@ export function AffiliatePage() {
   const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [lookupError, setLookupError] = useState<string | null>(null);
 
+  const [activeTab, setActiveTab] = useState<'register' | 'lookup'>('register');
+  const [showOptional, setShowOptional] = useState(false);
+
   const applySuccess = useCallback((data: AffiliateDisplayData, source: SuccessSource) => {
     setSuccess(data);
     setStatus('success');
@@ -106,6 +109,8 @@ export function AffiliatePage() {
     setLookupStatus('idle');
     setCopyTarget(null);
     setCopyFeedback(null);
+    setActiveTab('register');
+    setShowOptional(false);
   }, []);
 
   const handleSubmit = useCallback(
@@ -301,7 +306,7 @@ export function AffiliatePage() {
                     <Copy size={18} aria-hidden="true" />
                     Copy Caption Promosi
                   </button>
-                  <button type="button" className="btn btn--navy" onClick={handleShareWhatsApp}>
+                  <button type="button" className="btn btn--wa-green" onClick={handleShareWhatsApp}>
                     <Share2 size={18} aria-hidden="true" />
                     Share ke WhatsApp
                   </button>
@@ -334,188 +339,217 @@ export function AffiliatePage() {
               </div>
             ) : (
               <>
-                <div className="affiliate-lookup">
-                  <h3 className="affiliate-lookup__title">Sudah pernah daftar?</h3>
-                  <p className="affiliate-lookup__copy">
-                    Masukkan nomor WhatsApp yang Anda gunakan saat mendaftar untuk melihat kembali
-                    link affiliate Anda.
-                  </p>
-                  <form className="affiliate-lookup__form" onSubmit={handleLookup} noValidate>
-                    <label className="affiliate-field affiliate-lookup__field">
-                      <span className="affiliate-field__label">WhatsApp</span>
-                      <input
-                        type="tel"
-                        className="form-input"
-                        value={lookupWhatsApp}
-                        onChange={(e) => {
-                          setLookupWhatsApp(e.target.value);
-                          setLookupError(null);
-                        }}
-                        placeholder="08xxxxxxxxxx"
-                        autoComplete="tel"
-                      />
-                    </label>
-                    {lookupError && (
-                      <div className="form-error affiliate-lookup__error" role="alert">
-                        {lookupError}
-                      </div>
-                    )}
-                    <button
-                      type="submit"
-                      className={`btn btn--secondary affiliate-lookup__submit${lookupStatus === 'loading' ? ' btn--loading' : ''}`}
-                      disabled={lookupStatus === 'loading'}
-                    >
-                      {lookupStatus === 'loading' ? 'Mencari…' : 'Lihat Link Saya'}
-                    </button>
-                  </form>
+                <div className="affiliate-tabs print-hide">
+                  <button
+                    type="button"
+                    className={`affiliate-tab-btn ${activeTab === 'register' ? 'affiliate-tab-btn--active' : ''}`}
+                    onClick={() => setActiveTab('register')}
+                  >
+                    Daftar Mitra Baru
+                  </button>
+                  <button
+                    type="button"
+                    className={`affiliate-tab-btn ${activeTab === 'lookup' ? 'affiliate-tab-btn--active' : ''}`}
+                    onClick={() => setActiveTab('lookup')}
+                  >
+                    Cek Link Saya
+                  </button>
                 </div>
 
-                <form className="affiliate-form" onSubmit={handleSubmit} noValidate>
-                  <div className="affiliate-form__grid">
-                    <label className="affiliate-field">
-                      <span className="affiliate-field__label">Nama lengkap *</span>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={form.nama}
-                        onChange={(e) => updateField('nama', e.target.value)}
-                        placeholder="Contoh: Ahmad Fauzi"
-                        autoComplete="name"
-                      />
-                    </label>
-
-                    <label className="affiliate-field">
-                      <span className="affiliate-field__label">WhatsApp *</span>
-                      <input
-                        type="tel"
-                        className="form-input"
-                        value={form.whatsapp}
-                        onChange={(e) => updateField('whatsapp', e.target.value)}
-                        placeholder="08xxxxxxxxxx"
-                        autoComplete="tel"
-                      />
-                    </label>
-
-                    <label className="affiliate-field">
-                      <span className="affiliate-field__label">Kota *</span>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={form.kota}
-                        onChange={(e) => updateField('kota', e.target.value)}
-                        placeholder="Contoh: Cirebon"
-                      />
-                    </label>
+                {activeTab === 'lookup' ? (
+                  <div className="affiliate-lookup">
+                    <h3 className="affiliate-lookup__title">Sudah pernah daftar?</h3>
+                    <p className="affiliate-lookup__copy">
+                      Masukkan nomor WhatsApp yang Anda gunakan saat mendaftar untuk melihat kembali
+                      link affiliate Anda.
+                    </p>
+                    <form className="affiliate-lookup__form" onSubmit={handleLookup} noValidate>
+                      <label className="affiliate-field affiliate-lookup__field">
+                        <span className="affiliate-field__label">WhatsApp</span>
+                        <input
+                          type="tel"
+                          className="form-input"
+                          value={lookupWhatsApp}
+                          onChange={(e) => {
+                            setLookupWhatsApp(e.target.value);
+                            setLookupError(null);
+                          }}
+                          placeholder="08xxxxxxxxxx"
+                          autoComplete="tel"
+                        />
+                      </label>
+                      {lookupError && (
+                        <div className="form-error affiliate-lookup__error" role="alert">
+                          {lookupError}
+                        </div>
+                      )}
+                      <button
+                        type="submit"
+                        className={`btn btn--secondary affiliate-lookup__submit${lookupStatus === 'loading' ? ' btn--loading' : ''}`}
+                        disabled={lookupStatus === 'loading'}
+                      >
+                        {lookupStatus === 'loading' ? 'Mencari…' : 'Lihat Link Saya'}
+                      </button>
+                    </form>
                   </div>
-
-                  <div className="affiliate-form__optional">
-                    <p className="affiliate-form__optional-title">Data tambahan (opsional)</p>
+                ) : (
+                  <form className="affiliate-form" onSubmit={handleSubmit} noValidate>
                     <div className="affiliate-form__grid">
                       <label className="affiliate-field">
-                        <span className="affiliate-field__label">Email</span>
+                        <span className="affiliate-field__label">Nama lengkap *</span>
                         <input
-                          type="email"
+                          type="text"
                           className="form-input"
-                          value={form.email}
-                          onChange={(e) => updateField('email', e.target.value)}
-                          placeholder="nama@email.com"
-                          autoComplete="email"
+                          value={form.nama}
+                          onChange={(e) => updateField('nama', e.target.value)}
+                          placeholder="Contoh: Ahmad Fauzi"
+                          autoComplete="name"
                         />
                       </label>
 
                       <label className="affiliate-field">
-                        <span className="affiliate-field__label">Profesi / komunitas</span>
+                        <span className="affiliate-field__label">WhatsApp *</span>
                         <input
-                          type="text"
+                          type="tel"
                           className="form-input"
-                          value={form.profesi}
-                          onChange={(e) => updateField('profesi', e.target.value)}
-                          placeholder="Contoh: Komunitas Orang Tua"
+                          value={form.whatsapp}
+                          onChange={(e) => updateField('whatsapp', e.target.value)}
+                          placeholder="08xxxxxxxxxx"
+                          autoComplete="tel"
                         />
                       </label>
 
                       <label className="affiliate-field">
-                        <span className="affiliate-field__label">Akun media sosial</span>
-                        <input
-                          type="url"
-                          className="form-input"
-                          value={form.media_sosial}
-                          onChange={(e) => updateField('media_sosial', e.target.value)}
-                          placeholder="https://instagram.com/..."
-                        />
-                      </label>
-
-                      <label className="affiliate-field">
-                        <span className="affiliate-field__label">Nama bank / e-wallet</span>
+                        <span className="affiliate-field__label">Kota *</span>
                         <input
                           type="text"
                           className="form-input"
-                          value={form.bank}
-                          onChange={(e) => updateField('bank', e.target.value)}
-                          placeholder="Contoh: BCA / Mandiri / GoPay"
-                        />
-                      </label>
-
-                      <label className="affiliate-field">
-                        <span className="affiliate-field__label">Nomor rekening / e-wallet</span>
-                        <input
-                          type="text"
-                          className="form-input"
-                          value={form.rekening}
-                          onChange={(e) => updateField('rekening', e.target.value)}
-                          placeholder="Contoh: 1234567890"
-                        />
-                      </label>
- 
-                      <label className="affiliate-field">
-                        <span className="affiliate-field__label">Nama pemilik rekening</span>
-                        <input
-                          type="text"
-                          className="form-input"
-                          value={form.nama_rekening}
-                          onChange={(e) => updateField('nama_rekening', e.target.value)}
-                          placeholder="Sesuai nama di rekening"
+                          value={form.kota}
+                          onChange={(e) => updateField('kota', e.target.value)}
+                          placeholder="Contoh: Cirebon"
                         />
                       </label>
                     </div>
-                  </div>
 
-                  <div className="affiliate-rules">
-                    <h3 className="affiliate-rules__title">Aturan Affiliate</h3>
-                    <ul className="affiliate-rules__list">
-                      {RULES.map((rule) => (
-                        <li key={rule}>{rule}</li>
-                      ))}
-                    </ul>
-                  </div>
+                    <button
+                      type="button"
+                      className="affiliate-optional-toggle"
+                      onClick={() => setShowOptional(!showOptional)}
+                    >
+                      {showOptional ? 'Sembunyikan Data Opsional ▲' : 'Isi Data Opsional / Rekening Komisi ▼'}
+                    </button>
 
-                  <label className="affiliate-consent">
-                    <input
-                      type="checkbox"
-                      checked={form.agree_terms}
-                      onChange={(e) => updateField('agree_terms', e.target.checked)}
-                    />
-                    <span>
-                      Saya memahami bahwa komisi hanya diberikan untuk peserta yang benar-benar
-                      membayar, data lead diverifikasi admin TEKAD, dan pembayaran komisi dilakukan
-                      manual sesuai jadwal TEKAD.
-                    </span>
-                  </label>
+                    <div className={`affiliate-form__optional-wrapper ${showOptional ? 'affiliate-form__optional-wrapper--open' : ''}`}>
+                      <div className="affiliate-form__optional">
+                        <p className="affiliate-form__optional-title">Data tambahan (opsional)</p>
+                        <div className="affiliate-form__grid">
+                          <label className="affiliate-field">
+                            <span className="affiliate-field__label">Email</span>
+                            <input
+                              type="email"
+                              className="form-input"
+                              value={form.email}
+                              onChange={(e) => updateField('email', e.target.value)}
+                              placeholder="nama@email.com"
+                              autoComplete="email"
+                            />
+                          </label>
 
-                  {error && (
-                    <div className="form-error affiliate-form__error" role="alert">
-                      {error}
+                          <label className="affiliate-field">
+                            <span className="affiliate-field__label">Profesi / komunitas</span>
+                            <input
+                              type="text"
+                              className="form-input"
+                              value={form.profesi}
+                              onChange={(e) => updateField('profesi', e.target.value)}
+                              placeholder="Contoh: Komunitas Orang Tua"
+                            />
+                          </label>
+
+                          <label className="affiliate-field">
+                            <span className="affiliate-field__label">Akun media sosial</span>
+                            <input
+                              type="url"
+                              className="form-input"
+                              value={form.media_sosial}
+                              onChange={(e) => updateField('media_sosial', e.target.value)}
+                              placeholder="https://instagram.com/..."
+                            />
+                          </label>
+
+                          <label className="affiliate-field">
+                            <span className="affiliate-field__label">Nama bank / e-wallet</span>
+                            <input
+                              type="text"
+                              className="form-input"
+                              value={form.bank}
+                              onChange={(e) => updateField('bank', e.target.value)}
+                              placeholder="Contoh: BCA / Mandiri / GoPay"
+                            />
+                          </label>
+
+                          <label className="affiliate-field">
+                            <span className="affiliate-field__label">Nomor rekening / e-wallet</span>
+                            <input
+                              type="text"
+                              className="form-input"
+                              value={form.rekening}
+                              onChange={(e) => updateField('rekening', e.target.value)}
+                              placeholder="Contoh: 1234567890"
+                            />
+                          </label>
+
+                          <label className="affiliate-field">
+                            <span className="affiliate-field__label">Nama pemilik rekening</span>
+                            <input
+                              type="text"
+                              className="form-input"
+                              value={form.nama_rekening}
+                              onChange={(e) => updateField('nama_rekening', e.target.value)}
+                              placeholder="Sesuai nama di rekening"
+                            />
+                          </label>
+                        </div>
+                      </div>
                     </div>
-                  )}
 
-                  <button
-                    type="submit"
-                    className={`btn btn--primary btn--lg affiliate-form__submit${status === 'loading' ? ' btn--loading' : ''}`}
-                    disabled={status === 'loading'}
-                  >
-                    {status === 'loading' ? 'Mendaftar…' : 'Daftar & Buat Link Affiliate'}
-                  </button>
-                </form>
+                    <div className="affiliate-rules">
+                      <h3 className="affiliate-rules__title">Aturan Affiliate</h3>
+                      <ul className="affiliate-rules__list">
+                        {RULES.map((rule) => (
+                          <li key={rule}>{rule}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <label className="affiliate-consent">
+                      <input
+                        type="checkbox"
+                        checked={form.agree_terms}
+                        onChange={(e) => updateField('agree_terms', e.target.checked)}
+                      />
+                      <span>
+                        Saya memahami bahwa komisi hanya diberikan untuk peserta yang benar-benar
+                        membayar, data lead diverifikasi admin TEKAD, dan pembayaran komisi dilakukan
+                        manual sesuai jadwal TEKAD.
+                      </span>
+                    </label>
+
+                    {error && (
+                      <div className="form-error affiliate-form__error" role="alert">
+                        {error}
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      className={`btn btn--primary btn--lg affiliate-form__submit${status === 'loading' ? ' btn--loading' : ''}`}
+                      disabled={status === 'loading'}
+                    >
+                      {status === 'loading' ? 'Mendaftar…' : 'Daftar & Buat Link Affiliate'}
+                    </button>
+                  </form>
+                )}
               </>
             )}
           </div>

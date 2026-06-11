@@ -164,9 +164,10 @@
 }
 
 .affiliate-rules {
-  margin-bottom: 1rem;
-  padding: 1rem 1.125rem;
-  background: var(--color-brand-red-light);
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-cream);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius);
 }
 
@@ -290,22 +291,22 @@
 }
 
 .affiliate-success__reset {
-  margin-top: 1.25rem;
-  width: 100%;
-  min-height: 2.75rem;
+  display: block;
+  margin: 1.5rem auto 0;
   background: transparent;
-  border: 1px solid var(--color-border);
+  border: none;
   color: var(--color-muted);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
+  text-align: center;
+  width: auto;
 }
 
 .affiliate-success__reset:hover {
   color: var(--color-brand-red);
-  border-color: var(--color-brand-red);
 }
 
 .affiliate-success__label {
@@ -439,4 +440,67 @@
     width: 100%;
     max-width: 100%;
   }
+}
+
+/* ── Affiliate Tabs ── */
+.affiliate-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.affiliate-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 1rem 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.affiliate-tab-btn:hover {
+  color: var(--color-brand-red);
+}
+
+.affiliate-tab-btn--active {
+  color: var(--color-brand-red);
+  border-bottom-color: var(--color-brand-red);
+}
+
+/* ── Collapsible Optional Section ── */
+.affiliate-optional-toggle {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: var(--color-brand-red);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  margin: 1.5rem 0;
+  transition: color 0.15s;
+}
+
+.affiliate-optional-toggle:hover {
+  color: var(--color-brand-red-hover);
+}
+
+.affiliate-form__optional-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.affiliate-form__optional-wrapper--open {
+  max-height: 800px;
 }
