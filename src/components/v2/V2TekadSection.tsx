@@ -14,12 +14,10 @@ export function V2TekadSection() {
         <h2 className="v2-section__title">Tentang LPK TEKAD</h2>
         <div className="v2-section__body">
           <p>
-            LPK TEKAD berfokus pada pelatihan digital marketing, AI, social media marketing,
-            content creation, dan keterampilan bisnis.
+            LPK TEKAD berfokus pada pelatihan keterampilan digital, AI, marketing, content creation, dan pengembangan karier/bisnis.
           </p>
           <p>
-            Pembelajaran menekankan praktik langsung, pendampingan, portofolio, sertifikat, serta
-            orientasi karir dan bisnis.
+            Program pembelajaran TEKAD diarahkan agar relevan dengan kebutuhan industri dan kompetensi kerja modern.
           </p>
         </div>
         <p className="v2-section__title" style={{ fontSize: '1rem', marginTop: '1.25rem' }}>

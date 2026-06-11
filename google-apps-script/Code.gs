@@ -666,7 +666,7 @@ function buildAffiliateLink(baseUrl, kodeRef) {
 
 function buildAffiliateCaption(linkRef) {
   return (
-    'Bunda/Ayah, kalau anak sedang bingung arah setelah lulus sekolah atau belum siap masuk dunia kerja, TEKAD mengadakan webinar gratis:\n\n' +
+    'Bapak/Ibu, kalau anak sedang bingung arah setelah lulus sekolah atau belum siap masuk dunia kerja, TEKAD mengadakan webinar gratis:\n\n' +
     '"Dari Bingung Arah Menjadi Siap Kerja"\n\n' +
     'Di webinar ini akan dibahas bagaimana anak bisa mulai membangun skill digital, AI, portofolio, dan kesiapan kerja tanpa harus bingung mulai dari mana.\n\n' +
     'Daftar gratis di sini:\n' +

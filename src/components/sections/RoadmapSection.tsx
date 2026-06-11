@@ -46,7 +46,7 @@ export function RoadmapSection({ onOpenForm }: RoadmapSectionProps) {
               className="btn btn--primary roadmap__cta-desktop"
               onClick={() => onOpenForm('roadmap')}
             >
-              Mulai dari Webinar Gratis
+              Daftar Webinar Gratis via WhatsApp
             </button>
           </div>
 

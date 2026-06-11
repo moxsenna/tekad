@@ -24,7 +24,7 @@ export function Header({ onOpenForm, className }: HeaderProps) {
           className="btn btn--primary btn--sm"
           onClick={() => onOpenForm('header')}
         >
-          Daftar Gratis
+          Daftar via WhatsApp
         </button>
       </div>
     </header>

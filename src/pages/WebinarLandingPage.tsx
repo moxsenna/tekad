@@ -14,6 +14,10 @@ import { MaterialSection } from '../components/sections/MaterialSection';
 import { AfterRegisterSection } from '../components/sections/AfterRegisterSection';
 import { TekadSection } from '../components/sections/TekadSection';
 import { FormCtaSection } from '../components/sections/FormCtaSection';
+import { WhyImportantSection } from '../components/sections/WhyImportantSection';
+import { BonusFreeSection } from '../components/sections/BonusFreeSection';
+import { SpeakerSection } from '../components/sections/SpeakerSection';
+import { TrustLPKSection } from '../components/sections/TrustLPKSection';
 import { lookupAffiliateByCode } from '../lib/lookupAffiliateByCode';
 import { getEffectiveReferral, isDirectReferral } from '../lib/referral';
 import {
@@ -93,13 +97,17 @@ export function WebinarLandingPage() {
         <HeroSection onOpenForm={openForm} />
         <TrustStrip />
         <ProblemSection />
+        <WhyImportantSection />
         <RoadmapSection onOpenForm={openForm} />
         <BenefitSection />
         <AudienceSection />
         <CommitmentSection />
         <MaterialSection />
+        <BonusFreeSection />
         <AfterRegisterSection />
         <TekadSection />
+        <SpeakerSection />
+        <TrustLPKSection />
         <FormCtaSection onOpenForm={openForm} />
       </main>
       {referralDisplayName && (

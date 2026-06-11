@@ -31,7 +31,7 @@ export function StickyMobileCta({ onOpenForm, isFormOpen }: StickyMobileCtaProps
         className="btn btn--primary sticky-cta__btn"
         onClick={() => onOpenForm('sticky')}
       >
-        Daftar Gratis
+        Daftar via WhatsApp
       </button>
       <span className="sticky-cta__micro">Webinar gratis via WhatsApp</span>
     </div>

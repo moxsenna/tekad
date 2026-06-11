@@ -11,7 +11,7 @@ export function V2ProblemSection() {
             Sering pakai HP, tapi belum tahu cara memakainya untuk belajar, berkarya, dan
             membangun peluang.
           </p>
-          <p>Ayah/Bunda ingin membantu.</p>
+          <p>Bapak/Ibu ingin membantu.</p>
           <p>Tapi kadang bingung harus mulai dari mana.</p>
         </div>
       </div>

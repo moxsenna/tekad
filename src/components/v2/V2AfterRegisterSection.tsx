@@ -1,7 +1,7 @@
 const STEPS = [
   {
     title: 'Isi form singkat',
-    text: 'Ayah/Bunda mengisi nama, WhatsApp, dan kondisi anak.',
+    text: 'Bapak/Ibu mengisi nama, WhatsApp, dan kondisi anak.',
   },
   {
     title: 'Tim TEKAD mengirim info webinar',
@@ -9,11 +9,11 @@ const STEPS = [
   },
   {
     title: 'Ikut webinar gratis',
-    text: 'Ayah/Bunda mendapat gambaran arah, skill, dan langkah awal untuk anak.',
+    text: 'Bapak/Ibu mendapat gambaran arah, skill, dan langkah awal untuk anak.',
   },
   {
     title: 'Bisa konsultasi',
-    text: 'Jika berkenan, Ayah/Bunda bisa diskusi kondisi anak setelah webinar.',
+    text: 'Jika berkenan, Bapak/Ibu bisa diskusi kondisi anak setelah webinar.',
   },
 ] as const;
 

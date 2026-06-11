@@ -14,12 +14,14 @@ export function TekadSection() {
     <section className="section section--cream" id="tentang">
       <div className="container">
         <h2 className="section__title">Tentang LPK TEKAD</h2>
-        <p className="section__subtitle section__subtitle--narrow">
-          LPK TEKAD adalah lembaga pelatihan yang berfokus pada penguatan keterampilan bisnis,
-          digital marketing, AI, social media marketing, dan content creation. Pembelajaran
-          menekankan praktik langsung, pendampingan, portofolio nyata, sertifikat, serta orientasi
-          karir dan bisnis.
-        </p>
+        <div className="section__subtitle section__subtitle--narrow" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+          <p>
+            LPK TEKAD berfokus pada pelatihan keterampilan digital, AI, marketing, content creation, dan pengembangan karier/bisnis.
+          </p>
+          <p>
+            Program pembelajaran TEKAD diarahkan agar relevan dengan kebutuhan industri dan kompetensi kerja modern.
+          </p>
+        </div>
         <div className="trust-grid">
           {trustCards.map(({ icon: Icon, text }) => (
             <div key={text} className="trust-card">

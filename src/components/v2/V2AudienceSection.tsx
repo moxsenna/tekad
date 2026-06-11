@@ -20,7 +20,7 @@ export function V2AudienceSection() {
           ))}
         </ul>
         <p className="v2-microcopy">
-          Kalau salah satu poin di atas terasa dekat dengan kondisi anak Ayah/Bunda, webinar ini
+          Kalau salah satu poin di atas terasa dekat dengan kondisi anak Bapak/Ibu, webinar ini
           cocok diikuti.
         </p>
       </div>

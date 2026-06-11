@@ -14,6 +14,10 @@ import { V2MaterialSection } from '../components/v2/V2MaterialSection';
 import { V2AfterRegisterSection } from '../components/v2/V2AfterRegisterSection';
 import { V2TekadSection } from '../components/v2/V2TekadSection';
 import { V2CtaSection } from '../components/v2/V2CtaSection';
+import { WhyImportantSection } from '../components/sections/WhyImportantSection';
+import { BonusFreeSection } from '../components/sections/BonusFreeSection';
+import { SpeakerSection } from '../components/sections/SpeakerSection';
+import { TrustLPKSection } from '../components/sections/TrustLPKSection';
 import { lookupAffiliateByCode } from '../lib/lookupAffiliateByCode';
 import {
   trackLandingPageView,
@@ -97,13 +101,17 @@ export function LandingPageV2() {
         <V2HeroSection onOpenForm={openForm} />
         <V2EventInfoSection />
         <V2ProblemSection />
+        <WhyImportantSection />
         <V2RoadmapSection onOpenForm={openForm} />
         <V2BenefitSection />
         <V2AudienceSection />
         <CommitmentSection />
         <V2MaterialSection />
+        <BonusFreeSection />
         <V2AfterRegisterSection />
         <V2TekadSection />
+        <SpeakerSection />
+        <TrustLPKSection />
         <V2CtaSection onOpenForm={openForm} />
       </main>
       {referralDisplayName && (

@@ -18,7 +18,7 @@ export function FormCtaSection({ onOpenForm }: FormCtaSectionProps) {
           className="btn btn--primary btn--lg"
           onClick={() => onOpenForm('final')}
         >
-          Mulai Daftar Gratis
+          Daftar Webinar Gratis via WhatsApp
         </button>
         <p className="cta-section__microcopy">Proses daftar kurang dari 2 menit.</p>
         <div className="disclaimer-card">

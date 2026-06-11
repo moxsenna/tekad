@@ -48,7 +48,7 @@ export function V2RoadmapSection({ onOpenForm }: V2RoadmapSectionProps) {
           style={{ marginTop: '1.25rem' }}
           onClick={() => onOpenForm('roadmap')}
         >
-          Daftar Webinar Gratis
+          Daftar Webinar Gratis via WhatsApp
         </button>
       </div>
     </section>

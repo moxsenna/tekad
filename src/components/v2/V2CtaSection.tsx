@@ -18,7 +18,7 @@ export function V2CtaSection({ onOpenForm }: V2CtaSectionProps) {
           className="btn btn--primary btn--lg"
           onClick={() => onOpenForm('final')}
         >
-          Mulai Daftar Gratis
+          Daftar Webinar Gratis via WhatsApp
         </button>
         <p className="v2-microcopy">Proses daftar kurang dari 2 menit.</p>
         <div className="v2-disclaimer">

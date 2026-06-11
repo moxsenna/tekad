@@ -1,11 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Printer, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
 import { Logo } from '../components/layout/Logo';
 import { Footer } from '../components/layout/Footer';
-import { TypeformLeadForm } from '../components/form/TypeformLeadForm';
-import { getEffectiveReferral } from '../lib/referral';
-import { captureTracking } from '../lib/tracking';
-import { trackLandingPageView, trackWebinarFormOpen } from '../lib/metaPixel';
+import { trackLandingPageView } from '../lib/metaPixel';
 
 interface ChecklistItem {
   id: string;
@@ -42,6 +39,11 @@ const CHECKLIST_DATA: ChecklistCategory[] = [
         label: 'Inisiatif Eksplorasi',
         description: 'Punya kemauan sendiri untuk mengeksplorasi minat atau belajar keterampilan baru di luar sekolah.',
       },
+      {
+        id: 'char_5',
+        label: 'Manajemen Waktu Produktif',
+        description: 'Mampu membagi waktu antara hiburan (gaming/sosmed) dan kegiatan produktif belajar mandiri.',
+      },
     ],
   },
   {
@@ -66,6 +68,11 @@ const CHECKLIST_DATA: ChecklistCategory[] = [
         id: 'tech_4',
         label: 'Desain Visual Dasar',
         description: 'Bisa membuat desain/presentasi sederhana menggunakan Canva untuk kebutuhan komunikasi visual.',
+      },
+      {
+        id: 'tech_5',
+        label: 'Keamanan & Etika Digital',
+        description: 'Paham dasar privasi online (sandi aman, waspada penipuan phishing) dan menjaga reputasi jejak digital.',
       },
     ],
   },
@@ -92,6 +99,11 @@ const CHECKLIST_DATA: ChecklistCategory[] = [
         label: 'Kerapian Berbagi Link',
         description: 'Paham cara share link Google Drive/portofolio dengan izin akses "Anyone with link can view".',
       },
+      {
+        id: 'port_5',
+        label: 'Konsistensi Kehadiran Online',
+        description: 'Punya akun portofolio/karya publik (seperti GitHub, Behance, Medium, atau akun khusus karya) yang diupdate dalam 3 bulan terakhir.',
+      },
     ],
   },
   {
@@ -117,22 +129,17 @@ const CHECKLIST_DATA: ChecklistCategory[] = [
         label: 'Etika Pertemuan Online',
         description: 'Punya kebiasaan menyalakan kamera, berpakaian rapi, dan mematikan mic dengan tepat saat Zoom/Meet.',
       },
+      {
+        id: 'comm_5',
+        label: 'Kerjasama Tim (Collaboration)',
+        description: 'Mampu mendengarkan masukan, menerima kritik konstruktif, dan berdiskusi secara sehat dalam kelompok.',
+      },
     ],
   },
 ];
 
 export function BonusChecklistPage() {
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-  const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const refCode = useMemo(() => getEffectiveReferral(), []);
-  const tracking = useMemo(
-    () => ({
-      ...captureTracking(),
-      ref_code: refCode,
-    }),
-    [refCode]
-  );
 
   useEffect(() => {
     trackLandingPageView('main'); // track PageView using main tracker
@@ -189,15 +196,6 @@ export function BonusChecklistPage() {
     window.print();
   };
 
-  const openForm = useCallback(() => {
-    trackWebinarFormOpen('main', 'checklist');
-    setIsFormOpen(true);
-  }, []);
-
-  const closeForm = useCallback(() => {
-    setIsFormOpen(false);
-  }, []);
-
   return (
     <>
       <header className="header print-hide">
@@ -220,7 +218,7 @@ export function BonusChecklistPage() {
               <span className="checklist-hero__badge print-hide">EVALUASI MANDIRI GRATIS</span>
               <h1 className="checklist-hero__title">Checklist Kesiapan Kerja Anak</h1>
               <p className="checklist-hero__subtitle">
-                Bantu Ayah/Bunda mengevaluasi tingkat kesiapan putra-putrinya menghadapi era kerja digital & AI. Centang setiap poin yang sudah dimiliki anak saat ini.
+                Bantu Bapak/Ibu mengevaluasi tingkat kesiapan putra-putrinya menghadapi era kerja digital & AI. Centang setiap poin yang sudah dimiliki anak saat ini.
               </p>
               <div className="checklist-hero__actions print-hide">
                 <button type="button" className="btn btn--secondary" onClick={handlePrint}>
@@ -283,16 +281,6 @@ export function BonusChecklistPage() {
                     <p className="score-widget__desc">{assessmentResult.desc}</p>
                   </div>
 
-                  <div className="score-widget__cta print-hide">
-                    <h4 className="score-widget__cta-title">Langkah Tindak Lanjut:</h4>
-                    <p className="score-widget__cta-desc">
-                      Ikuti webinar gratis TEKAD untuk memandu langkah pertama membangun keterampilan digital, AI, dan kemandirian masa depan anak Anda.
-                    </p>
-                    <button type="button" className="btn btn--primary btn--full" onClick={openForm}>
-                      Daftar Webinar Gratis
-                    </button>
-                    <p className="score-widget__micro">Kurang dari 2 menit untuk mendaftar</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -301,14 +289,6 @@ export function BonusChecklistPage() {
       </main>
 
       <Footer />
-
-      <TypeformLeadForm
-        isOpen={isFormOpen}
-        onClose={closeForm}
-        tracking={tracking}
-        refCode={refCode}
-        lpVariant="main"
-      />
     </>
   );
 }

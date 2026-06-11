@@ -150,6 +150,9 @@ export function TypeformLeadForm({
             <p className="form-step__helper">
               Isi nama dan nomor WhatsApp Bapak/Ibu di bawah ini untuk memulai pendaftaran webinar gratis.
             </p>
+            <div className="form-step__assurance">
+              ⚡ Hanya 3 langkah, kurang dari 2 menit.
+            </div>
             <div className="form-group-stacked">
               <div className="form-field-wrapper">
                 <label className="form-field-label">Nama Lengkap Anda</label>
@@ -211,7 +214,7 @@ export function TypeformLeadForm({
             </div>
 
             <div className="form-field-wrapper" style={{ marginTop: '1.25rem' }}>
-              <label className="form-field-label">3. Apa kekhawatiran terbesar Ibu/Bapak? (Opsional)</label>
+              <label className="form-field-label">3. Apa kekhawatiran terbesar Bapak/Ibu? (Opsional)</label>
               <textarea
                 className="form-input form-textarea form-textarea--small"
                 placeholder="Boleh ditulis singkat. Contoh: belum percaya diri, kecanduan game, dll."
