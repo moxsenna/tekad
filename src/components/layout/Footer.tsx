@@ -5,8 +5,7 @@ export function Footer() {
   let adminPhone = import.meta.env.VITE_WHATSAPP_ADMIN_PHONE || '6285117259331';
   adminPhone = adminPhone.replace(/\D/g, '');
 
-  // Safety override: if the production environment still holds the old number, force the new one.
-  if (adminPhone === '6285188438643') {
+  if (!adminPhone) {
     adminPhone = '6285117259331';
   }
 

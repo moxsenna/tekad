@@ -53,7 +53,7 @@ export function buildWhatsAppRedirectUrl(
   formData: WhatsAppMessageFields,
   options?: WhatsAppRedirectOptions
 ): string {
-  const adminPhone = sanitizeWhatsAppPhone(
+  let adminPhone = sanitizeWhatsAppPhone(
     options?.adminPhone ?? readEnv('VITE_WHATSAPP_ADMIN_PHONE')
   );
 
@@ -83,9 +83,6 @@ export function getWhatsAppRedirectUrl(formData?: WhatsAppMessageFields): string
   }
 
   const legacyUrl = readEnv('VITE_WHATSAPP_REDIRECT_URL');
-  if (!legacyUrl) {
-    console.warn('VITE_WHATSAPP_ADMIN_PHONE and VITE_WHATSAPP_REDIRECT_URL are not set');
-  }
   return legacyUrl || '#';
 }
 

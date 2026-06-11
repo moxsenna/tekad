@@ -64,9 +64,9 @@ const dynamicUrl = buildWhatsAppRedirectUrl(
     kondisi_anak: 'Masih bingung mau kuliah atau kerja',
     kota: 'Cirebon',
   },
-  { adminPhone: '6285188438643' }
+  { adminPhone: '6285117259331' }
 );
-assert('admin phone: uses configured number', dynamicUrl.includes('phone=6285188438643'));
+assert('admin phone: uses configured number', dynamicUrl.includes('phone=6285117259331'));
 
 // Test 5 — admin phone kosong, fallback legacy
 const fallbackUrl = buildWhatsAppRedirectUrl(
@@ -80,7 +80,7 @@ assert('encoded: uses encodeURIComponent', dynamicUrl.includes(encodeURIComponen
 assert('encoded: newline safe', dynamicUrl.includes('%0A'));
 
 // sanitizeWhatsAppPhone
-assert('sanitize: strips non-digits', sanitizeWhatsAppPhone('+62 851-8843-8643') === '6285188438643');
+assert('sanitize: strips non-digits', sanitizeWhatsAppPhone('+62 851-1725-9331') === '6285117259331');
 assert('sanitize: empty input', sanitizeWhatsAppPhone('') === '');
 
 console.log(`\nWhatsApp helper tests: ${passed} passed, ${failed} failed`);
