@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import type { TrackingData } from '../../types/lead';
 import { useFormState } from '../../hooks/useFormState';
 import {
-  trackWebinarFormReview,
+  trackAddPaymentInfo,
   trackWebinarFormStart,
   trackWebinarFormStep,
   trackWebinarRegistrationSuccess,
@@ -11,17 +11,14 @@ import {
 } from '../../lib/metaPixel';
 import type { LpVariant } from '../../lib/routing';
 import {
-  KONSULTASI_OPTIONS,
   KONDISI_ANAK_OPTIONS,
   STATUS_ANAK_OPTIONS,
-  TOTAL_QUESTION_STEPS,
 } from '../../lib/formConfig';
 import { submitLead } from '../../lib/submitLead';
 import { buildWhatsAppRedirectUrl, redirectToWhatsApp } from '../../lib/whatsapp';
 import { Logo } from '../layout/Logo';
 import { ChoiceCard } from './ChoiceCard';
 import { ProgressBar } from './ProgressBar';
-import { ReviewSummary } from './ReviewSummary';
 
 interface TypeformLeadFormProps {
   isOpen: boolean;
@@ -33,7 +30,7 @@ interface TypeformLeadFormProps {
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error';
 
-const TRACKED_FORM_STEPS = new Set(['nama_orang_tua', 'whatsapp', 'review']);
+const TRACKED_FORM_STEPS = new Set(['identitas', 'kondisi', 'domisili']);
 
 export function TypeformLeadForm({
   isOpen,
@@ -53,7 +50,6 @@ export function TypeformLeadForm({
     setHoneypot,
     goNext,
     goBack,
-    skipKekhawatiran,
     reset,
     setError,
   } = useFormState();
@@ -79,13 +75,18 @@ export function TypeformLeadForm({
 
   useEffect(() => {
     if (!isOpen || !TRACKED_FORM_STEPS.has(currentStep)) return;
-    if (trackedStepsRef.current.has(currentStep)) return;
 
+    if (trackedStepsRef.current.size === 0) {
+      trackWebinarFormStart(lpVariant);
+    }
+
+    if (trackedStepsRef.current.has(currentStep)) return;
     trackedStepsRef.current.add(currentStep);
+
     trackWebinarFormStep(lpVariant, stepIndex, currentStep);
 
-    if (currentStep === 'review') {
-      trackWebinarFormReview(lpVariant);
+    if (currentStep === 'domisili') {
+      trackAddPaymentInfo({ lp_variant: lpVariant });
     }
   }, [currentStep, isOpen, lpVariant, stepIndex]);
 
@@ -138,194 +139,125 @@ export function TypeformLeadForm({
   if (!isOpen) return null;
 
   const showBack =
-    currentStep !== 'welcome' && submitStatus !== 'loading' && submitStatus !== 'success';
+    currentStep !== 'identitas' && submitStatus !== 'loading' && submitStatus !== 'success';
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 'welcome':
+      case 'identitas':
         return (
           <div className="form-step">
             <h2 className="form-step__title">Siap membantu anak lebih punya arah?</h2>
             <p className="form-step__helper">
-              Jawab beberapa pertanyaan singkat agar tim TEKAD dapat mengirimkan informasi webinar
-              yang sesuai dengan kondisi anak Bapak/Ibu.
+              Isi nama dan nomor WhatsApp Bapak/Ibu di bawah ini untuk memulai pendaftaran webinar gratis.
             </p>
-          </div>
-        );
-
-      case 'nama_orang_tua':
-        return (
-          <div className="form-step">
-            <p className="form-step__counter">Pertanyaan 1 dari {TOTAL_QUESTION_STEPS}</p>
-            <h2 className="form-step__title">Nama Bapak/Ibu siapa?</h2>
-            <p className="form-step__helper">
-              Kami akan menggunakan nama ini saat menghubungi Bapak/Ibu melalui WhatsApp.
-            </p>
-            <input
-              type="text"
-              className={`form-input${error ? ' form-input--error' : ''}`}
-              placeholder="Contoh: Ibu Siti / Bapak Ahmad"
-              value={formData.nama_orang_tua}
-              onChange={(e) => updateField('nama_orang_tua', e.target.value)}
-              onKeyDown={handleKeyDown}
-              autoFocus
-            />
-          </div>
-        );
-
-      case 'whatsapp':
-        return (
-          <div className="form-step">
-            <p className="form-step__counter">Pertanyaan 2 dari {TOTAL_QUESTION_STEPS}</p>
-            <h2 className="form-step__title">Nomor WhatsApp aktif Bapak/Ibu?</h2>
-            <p className="form-step__helper">
-              Link webinar dan informasi lanjutan akan dikirim melalui WhatsApp.
-            </p>
-            <input
-              type="tel"
-              className={`form-input${error ? ' form-input--error' : ''}`}
-              placeholder="08xxxxxxxxxx"
-              value={formData.whatsapp}
-              onChange={(e) => updateField('whatsapp', e.target.value)}
-              onKeyDown={handleKeyDown}
-              autoFocus
-            />
-          </div>
-        );
-
-      case 'status_anak':
-        return (
-          <div className="form-step">
-            <p className="form-step__counter">Pertanyaan 3 dari {TOTAL_QUESTION_STEPS}</p>
-            <h2 className="form-step__title">Saat ini anak Bapak/Ibu berada di tahap apa?</h2>
-            <p className="form-step__helper">Pilih yang paling sesuai.</p>
-            <div className="choice-list">
-              {STATUS_ANAK_OPTIONS.map((opt) => (
-                <ChoiceCard
-                  key={opt}
-                  label={opt}
-                  selected={formData.status_anak === opt}
-                  onSelect={() => updateField('status_anak', opt)}
+            <div className="form-group-stacked">
+              <div className="form-field-wrapper">
+                <label className="form-field-label">Nama Lengkap Anda</label>
+                <input
+                  type="text"
+                  className={`form-input${error && !formData.nama_orang_tua ? ' form-input--error' : ''}`}
+                  placeholder="Contoh: Ibu Siti / Bapak Ahmad"
+                  value={formData.nama_orang_tua}
+                  onChange={(e) => updateField('nama_orang_tua', e.target.value)}
+                  autoFocus
                 />
-              ))}
+              </div>
+              <div className="form-field-wrapper" style={{ marginTop: '1.25rem' }}>
+                <label className="form-field-label">Nomor WhatsApp Aktif</label>
+                <p className="form-step__helper-tiny">Jadwal dan link webinar akan dikirim ke nomor ini.</p>
+                <input
+                  type="tel"
+                  className={`form-input${error && !formData.whatsapp ? ' form-input--error' : ''}`}
+                  placeholder="Contoh: 08123456789"
+                  value={formData.whatsapp}
+                  onChange={(e) => updateField('whatsapp', e.target.value)}
+                />
+              </div>
             </div>
           </div>
         );
 
-      case 'kondisi_anak':
+      case 'kondisi':
         return (
           <div className="form-step">
-            <p className="form-step__counter">Pertanyaan 4 dari {TOTAL_QUESTION_STEPS}</p>
-            <h2 className="form-step__title">
-              Kondisi mana yang paling menggambarkan anak Bapak/Ibu saat ini?
-            </h2>
-            <p className="form-step__helper">
-              Jawaban ini membantu kami memahami kebutuhan anak Bapak/Ibu.
-            </p>
-            <div className="choice-list">
-              {KONDISI_ANAK_OPTIONS.map((opt) => (
-                <ChoiceCard
-                  key={opt}
-                  label={opt}
-                  selected={formData.kondisi_anak === opt}
-                  onSelect={() => updateField('kondisi_anak', opt)}
-                />
-              ))}
+            <h2 className="form-step__title">Kondisi Anak Saat Ini</h2>
+            
+            <div className="form-field-wrapper">
+              <label className="form-field-label">1. Tahap Pendidikan/Karir Anak</label>
+              <div className="choice-list choice-list--grid">
+                {STATUS_ANAK_OPTIONS.map((opt) => (
+                  <ChoiceCard
+                    key={opt}
+                    label={opt}
+                    selected={formData.status_anak === opt}
+                    onSelect={() => updateField('status_anak', opt)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="form-field-wrapper" style={{ marginTop: '1.25rem' }}>
+              <label className="form-field-label">2. Deskripsi Masalah Utama</label>
+              <div className="choice-list choice-list--grid">
+                {KONDISI_ANAK_OPTIONS.map((opt) => (
+                  <ChoiceCard
+                    key={opt}
+                    label={opt}
+                    selected={formData.kondisi_anak === opt}
+                    onSelect={() => updateField('kondisi_anak', opt)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="form-field-wrapper" style={{ marginTop: '1.25rem' }}>
+              <label className="form-field-label">3. Apa kekhawatiran terbesar Ibu/Bapak? (Opsional)</label>
+              <textarea
+                className="form-input form-textarea form-textarea--small"
+                placeholder="Boleh ditulis singkat. Contoh: belum percaya diri, kecanduan game, dll."
+                value={formData.kekhawatiran_utama}
+                onChange={(e) => updateField('kekhawatiran_utama', e.target.value)}
+              />
             </div>
           </div>
         );
 
-      case 'kekhawatiran_utama':
+      case 'domisili':
         return (
           <div className="form-step">
-            <p className="form-step__counter">Pertanyaan 5 dari {TOTAL_QUESTION_STEPS}</p>
-            <h2 className="form-step__title">
-              Apa kekhawatiran terbesar Bapak/Ibu tentang masa depan anak?
-            </h2>
+            <h2 className="form-step__title">Satu Langkah Terakhir</h2>
             <p className="form-step__helper">
-              Boleh ditulis singkat. Contoh: belum percaya diri, belum punya skill, terlalu sering
-              main HP, belum tahu mau kerja apa.
+              Kota atau domisili Bapak/Ibu saat ini? (Membantu kami menyesuaikan info jadwal kegiatan).
             </p>
-            <textarea
-              className="form-input form-textarea"
-              placeholder="Tulis kekhawatiran Bapak/Ibu di sini…"
-              value={formData.kekhawatiran_utama}
-              onChange={(e) => updateField('kekhawatiran_utama', e.target.value)}
-            />
-          </div>
-        );
-
-      case 'kota':
-        return (
-          <div className="form-step">
-            <p className="form-step__counter">Pertanyaan 6 dari {TOTAL_QUESTION_STEPS}</p>
-            <h2 className="form-step__title">Bapak/Ibu berdomisili di kota/kecamatan mana?</h2>
-            <p className="form-step__helper">
-              Ini membantu kami menyesuaikan informasi kegiatan dan konsultasi.
-            </p>
-            <input
-              type="text"
-              className={`form-input${error ? ' form-input--error' : ''}`}
-              placeholder="Contoh: Cirebon / Indramayu / Kuningan"
-              value={formData.kota}
-              onChange={(e) => updateField('kota', e.target.value)}
-              onKeyDown={handleKeyDown}
-              autoFocus
-            />
-          </div>
-        );
-
-      case 'bersedia_konsultasi':
-        return (
-          <div className="form-step">
-            <p className="form-step__counter">Pertanyaan 7 dari {TOTAL_QUESTION_STEPS}</p>
-            <h2 className="form-step__title">
-              Apakah Bapak/Ibu bersedia dihubungi untuk konsultasi gratis setelah webinar?
-            </h2>
-            <p className="form-step__helper">
-              Konsultasi ini bertujuan membantu memetakan kondisi anak. Tidak wajib langsung
-              mendaftar program.
-            </p>
-            <div className="choice-list">
-              {KONSULTASI_OPTIONS.map((opt) => (
-                <ChoiceCard
-                  key={opt}
-                  label={opt}
-                  selected={formData.bersedia_konsultasi === opt}
-                  onSelect={() => updateField('bersedia_konsultasi', opt)}
-                />
-              ))}
+            <div className="form-field-wrapper">
+              <input
+                type="text"
+                className={`form-input${error && !formData.kota ? ' form-input--error' : ''}`}
+                placeholder="Contoh: Cirebon / Indramayu / Kuningan"
+                value={formData.kota}
+                onChange={(e) => updateField('kota', e.target.value)}
+                onKeyDown={handleKeyDown}
+                autoFocus
+              />
             </div>
-          </div>
-        );
+            
+            <p className="form-consent" style={{ marginTop: '1.5rem' }}>
+              Dengan mendaftar, Bapak/Ibu bersedia dihubungi oleh tim TEKAD melalui WhatsApp untuk info link masuk webinar dan panduan kesiapan kerja anak.
+            </p>
 
-      case 'review':
-        return (
-          <div className="form-step">
-            <h2 className="form-step__title">Terima kasih, data hampir selesai.</h2>
-            <p className="form-step__helper">
-              Klik tombol di bawah ini untuk mengirim pendaftaran. Setelah berhasil, Bapak/Ibu
-              akan diarahkan ke WhatsApp TEKAD.
-            </p>
-            <ReviewSummary data={formData} />
-            <p className="form-consent">
-              Dengan mengisi form ini, Bapak/Ibu bersedia dihubungi oleh tim TEKAD melalui WhatsApp
-              untuk informasi webinar dan konsultasi terkait program.
-            </p>
             {submitStatus === 'success' && (
-              <div className="form-success" role="status">
+              <div className="form-success" role="status" style={{ marginTop: '1rem' }}>
                 {submitMessage}
                 {buildWhatsAppRedirectUrl(formData) !== '#' && (
                   <>
                     {' '}
-                    <a href={buildWhatsAppRedirectUrl(formData)}>Klik di sini</a> jika belum
-                    diarahkan otomatis.
+                    <a href={buildWhatsAppRedirectUrl(formData)}>Klik di sini</a> jika belum diarahkan otomatis.
                   </>
                 )}
               </div>
             )}
             {submitStatus === 'error' && (
-              <div className="form-error" role="alert">
+              <div className="form-error" role="alert" style={{ marginTop: '1rem' }}>
                 {submitMessage}
               </div>
             )}
@@ -340,42 +272,7 @@ export function TypeformLeadForm({
   const renderFooter = () => {
     if (submitStatus === 'success') return null;
 
-    if (currentStep === 'welcome') {
-      return (
-        <div className="form-overlay__footer form-overlay__footer--single">
-          <button
-            type="button"
-            className="btn btn--primary"
-            onClick={() => {
-              trackWebinarFormStart(lpVariant);
-              goNext();
-            }}
-          >
-            Mulai Daftar
-          </button>
-        </div>
-      );
-    }
-
-    if (currentStep === 'kekhawatiran_utama') {
-      return (
-        <div className="form-overlay__footer form-overlay__footer--triple">
-          {showBack && (
-            <button type="button" className="btn btn--secondary-text" onClick={goBack}>
-              Kembali
-            </button>
-          )}
-          <button type="button" className="btn btn--secondary-text" onClick={skipKekhawatiran}>
-            Lewati
-          </button>
-          <button type="button" className="btn btn--primary" onClick={goNext}>
-            Lanjut
-          </button>
-        </div>
-      );
-    }
-
-    if (currentStep === 'review') {
+    if (currentStep === 'domisili') {
       return (
         <div className="form-overlay__footer form-overlay__footer--double">
           {showBack && (
@@ -440,8 +337,8 @@ export function TypeformLeadForm({
 
       <div className="form-overlay__body">
         {renderStepContent()}
-        {error && currentStep !== 'review' && (
-          <div className="form-error" role="alert">
+        {error && (
+          <div className="form-error" role="alert" style={{ marginTop: '0.75rem' }}>
             {error}
           </div>
         )}

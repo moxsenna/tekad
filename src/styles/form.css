@@ -498,3 +498,50 @@
   width: 0;
   overflow: hidden;
 }
+
+/* ── Grouped / Stacked Form Styles (CRO updates) ── */
+.form-group-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.form-field-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+}
+
+.form-field-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+.form-step__helper-tiny {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  margin-top: -0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.choice-list--grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.625rem;
+}
+
+@media (min-width: 480px) {
+  .choice-list--grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.form-textarea--small {
+  min-height: 80px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem !important;
+}

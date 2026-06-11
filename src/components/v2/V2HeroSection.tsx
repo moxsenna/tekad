@@ -32,7 +32,7 @@ export function V2HeroSection({ onOpenForm }: V2HeroSectionProps) {
               className="btn btn--primary btn--lg"
               onClick={() => onOpenForm('hero')}
             >
-              Daftar Webinar Gratis
+              Daftar Gratis + Amankan Bonus Checklist
             </button>
             <p className="v2-microcopy">Gratis. Jadwal dan link webinar dikirim melalui WhatsApp.</p>
           </div>

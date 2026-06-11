@@ -979,6 +979,59 @@
   }
 }
 
+/* ── Commitment section ── */
+.commitment-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.commitment-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+}
+
+.commitment-card__icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-brand-red-light);
+  color: var(--color-brand-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.commitment-card__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--color-navy);
+}
+
+.commitment-card__text {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+@media (min-width: 768px) {
+  .commitment-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 /* ── Mobile overflow guards ── */
 @media (max-width: 640px) {
   .hero__grid,
@@ -999,7 +1052,8 @@
   .material-blocks,
   .timeline,
   .roadmap__steps,
-  .trust-grid {
+  .trust-grid,
+  .commitment-grid {
     grid-template-columns: 1fr;
   }
 

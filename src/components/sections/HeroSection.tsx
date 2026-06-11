@@ -24,7 +24,7 @@ export function HeroSection({ onOpenForm }: HeroSectionProps) {
                   className="btn btn--primary btn--lg"
                   onClick={() => onOpenForm('hero')}
                 >
-                  Daftar Webinar Gratis
+                  Daftar Gratis + Amankan Bonus Checklist
                 </button>
                 <a href="#alur" className="btn btn--secondary btn--lg">
                   Lihat Alurnya

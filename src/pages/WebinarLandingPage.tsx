@@ -9,6 +9,7 @@ import { ProblemSection } from '../components/sections/ProblemSection';
 import { RoadmapSection } from '../components/sections/RoadmapSection';
 import { BenefitSection } from '../components/sections/BenefitSection';
 import { AudienceSection } from '../components/sections/AudienceSection';
+import { CommitmentSection } from '../components/sections/CommitmentSection';
 import { MaterialSection } from '../components/sections/MaterialSection';
 import { AfterRegisterSection } from '../components/sections/AfterRegisterSection';
 import { TekadSection } from '../components/sections/TekadSection';
@@ -95,6 +96,7 @@ export function WebinarLandingPage() {
         <RoadmapSection onOpenForm={openForm} />
         <BenefitSection />
         <AudienceSection />
+        <CommitmentSection />
         <MaterialSection />
         <AfterRegisterSection />
         <TekadSection />

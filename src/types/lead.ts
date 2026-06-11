@@ -38,12 +38,6 @@ export interface SubmitResponse {
 }
 
 export type FormStepId =
-  | 'welcome'
-  | 'nama_orang_tua'
-  | 'whatsapp'
-  | 'status_anak'
-  | 'kondisi_anak'
-  | 'kekhawatiran_utama'
-  | 'kota'
-  | 'bersedia_konsultasi'
-  | 'review';
+  | 'identitas'
+  | 'kondisi'
+  | 'domisili';

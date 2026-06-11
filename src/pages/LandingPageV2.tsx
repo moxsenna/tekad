@@ -9,6 +9,7 @@ import { V2ProblemSection } from '../components/v2/V2ProblemSection';
 import { V2RoadmapSection } from '../components/v2/V2RoadmapSection';
 import { V2BenefitSection } from '../components/v2/V2BenefitSection';
 import { V2AudienceSection } from '../components/v2/V2AudienceSection';
+import { CommitmentSection } from '../components/sections/CommitmentSection';
 import { V2MaterialSection } from '../components/v2/V2MaterialSection';
 import { V2AfterRegisterSection } from '../components/v2/V2AfterRegisterSection';
 import { V2TekadSection } from '../components/v2/V2TekadSection';
@@ -99,6 +100,7 @@ export function LandingPageV2() {
         <V2RoadmapSection onOpenForm={openForm} />
         <V2BenefitSection />
         <V2AudienceSection />
+        <CommitmentSection />
         <V2MaterialSection />
         <V2AfterRegisterSection />
         <V2TekadSection />
