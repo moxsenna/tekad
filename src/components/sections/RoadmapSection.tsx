@@ -50,31 +50,29 @@ export function RoadmapSection({ onOpenForm }: RoadmapSectionProps) {
             </button>
           </div>
 
-          <div className="roadmap__aside">
-            <figure className="roadmap__visual">
-              <img
-                src="/roadmap-anak-siap-kerja.webp"
-                alt="Roadmap: Bingung Arah, Skill Digital, Portofolio, hingga Lebih Siap Menghadapi Dunia Kerja"
-                className="roadmap__image"
-                width={540}
-                height={960}
-                loading="lazy"
-              />
-            </figure>
+          <figure className="roadmap__visual">
+            <img
+              src="/roadmap-anak-siap-kerja.webp"
+              alt="Roadmap: Bingung Arah, Skill Digital, Portofolio, hingga Lebih Siap Menghadapi Dunia Kerja"
+              className="roadmap__image"
+              width={540}
+              height={960}
+              loading="lazy"
+            />
+          </figure>
 
-            <div className="roadmap__steps">
-              {ROADMAP_STEPS.map((step) => (
-                <div key={step.number} className="roadmap__step">
-                  <span className="roadmap__step-number" aria-hidden="true">
-                    {step.number}
-                  </span>
-                  <div className="roadmap__step-body">
-                    <h3 className="roadmap__step-title">{step.title}</h3>
-                    <p className="roadmap__step-text">{step.text}</p>
-                  </div>
+          <div className="roadmap__steps">
+            {ROADMAP_STEPS.map((step) => (
+              <div key={step.number} className="roadmap__step">
+                <span className="roadmap__step-number" aria-hidden="true">
+                  {step.number}
+                </span>
+                <div className="roadmap__step-body">
+                  <h3 className="roadmap__step-title">{step.title}</h3>
+                  <p className="roadmap__step-text">{step.text}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

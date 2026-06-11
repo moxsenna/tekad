@@ -35,6 +35,8 @@ export function TrustLPKSection() {
                 loading="lazy"
                 width={440}
                 height={620}
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
               />
             </div>
           </div>

@@ -281,8 +281,45 @@ export function BonusChecklistPage() {
                     <p className="score-widget__desc">{assessmentResult.desc}</p>
                   </div>
 
+                  <div className="score-widget__cta print-hide">
+                    <h3 className="score-widget__cta-title">Ingin dibantu membaca hasil checklist ini?</h3>
+                    <p className="score-widget__cta-desc">
+                      Kirim hasilnya ke Admin TEKAD via WhatsApp.
+                    </p>
+                    <a
+                      href={`https://api.whatsapp.com/send/?phone=${(import.meta.env.VITE_WHATSAPP_ADMIN_PHONE || '6285117259331').replace(/\D/g, '')}&text=${encodeURIComponent(
+                        `Halo Admin TEKAD, saya sudah isi Checklist Kesiapan Kerja Anak.\n\nSkor anak saya: ${score}/20\nKategori: ${assessmentResult.status}\n\nSaya ingin dibantu memahami langkah berikutnya.`
+                      )}&type=phone_number&app_absent=0`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--wa-green btn--sm"
+                      style={{ width: '100%', borderRadius: '8px' }}
+                    >
+                      Konsultasikan Hasil Checklist
+                    </a>
+                  </div>
+
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section section--cream checklist-bottom-cta print-hide">
+          <div className="container">
+            <div className="checklist-bottom-cta__card">
+              <h2 className="checklist-bottom-cta__title">Dapatkan Panduan Kesiapan Kerja Anak Lebih Lengkap</h2>
+              <p className="checklist-bottom-cta__desc">
+                Ikuti webinar gratis kami untuk mengetahui langkah-langkah praktis mendampingi anak menyongsong karir di masa depan.
+              </p>
+              <a
+                href="https://chat.whatsapp.com/LnPjrcx0cKZFetneOCmgu6?s=cl&p=a&ilr=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn--primary checklist-bottom-cta__btn"
+              >
+                Daftar Webinar Gratis
+              </a>
             </div>
           </div>
         </section>
