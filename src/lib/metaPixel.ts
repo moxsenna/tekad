@@ -1,7 +1,7 @@
 import type { LpVariant } from './routing';
 import { WEBINAR_THEME } from './webinarCopy';
 
-export const META_PIXEL_ID = '3987008871597140';
+export const META_PIXEL_ID = '1735894211091001';
 
 export type CtaLocation = 'hero' | 'sticky' | 'roadmap' | 'final' | 'header';
 
@@ -77,6 +77,14 @@ export function trackViewContent(params?: Record<string, unknown>): void {
   safeFbq('track', 'ViewContent', params);
 }
 
+export function trackAddToCart(params?: Record<string, unknown>): void {
+  safeFbq('track', 'AddToCart', params);
+}
+
+export function trackAddPaymentInfo(params?: Record<string, unknown>): void {
+  safeFbq('track', 'AddPaymentInfo', params);
+}
+
 export function trackLead(params?: Record<string, unknown>): void {
   safeFbq('track', 'Lead', params);
 }
@@ -102,6 +110,10 @@ export function trackLandingPageView(lpVariant: LpVariant): void {
 }
 
 export function trackWebinarFormOpen(lpVariant: LpVariant, ctaLocation?: CtaLocation): void {
+  trackAddToCart({
+    lp_variant: lpVariant,
+    ...(ctaLocation ? { cta_location: ctaLocation } : {}),
+  });
   trackCustom('WebinarFormOpen', {
     lp_variant: lpVariant,
     ...(ctaLocation ? { cta_location: ctaLocation } : {}),
@@ -125,6 +137,7 @@ export function trackWebinarFormStep(
 }
 
 export function trackWebinarFormReview(lpVariant: LpVariant): void {
+  trackAddPaymentInfo({ lp_variant: lpVariant });
   trackCustom('WebinarFormReview', { lp_variant: lpVariant });
 }
 
