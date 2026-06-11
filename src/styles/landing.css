@@ -920,22 +920,30 @@
 }
 
 .footer__whatsapp {
-  font-size: 0.9375rem;
-  color: var(--color-text);
-  font-weight: 500;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.footer__whatsapp a {
-  color: var(--color-brand-red);
-  text-decoration: none;
+.footer__wa-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px !important;
+  padding: 0.5rem 1.25rem !important;
+  font-size: 0.875rem !important;
   font-weight: 600;
-  transition: opacity 0.15s;
+  transition: all 0.15s ease;
+  background: var(--color-white) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-navy) !important;
+  box-shadow: var(--shadow-sm);
 }
 
-.footer__whatsapp a:hover {
-  text-decoration: underline;
-  opacity: 0.85;
+.footer__wa-btn:hover {
+  border-color: var(--color-brand-red) !important;
+  color: var(--color-brand-red) !important;
+  background: var(--color-warm-bg) !important;
+  transform: translateY(-1px);
 }
 
 .footer__copy {
