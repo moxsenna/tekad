@@ -21,6 +21,7 @@ const INITIAL_FORM: AffiliateFormData = {
   email: '',
   profesi: '',
   media_sosial: '',
+  bank: '',
   rekening: '',
   nama_rekening: '',
   agree_terms: false,
@@ -378,7 +379,7 @@ export function AffiliatePage() {
                         className="form-input"
                         value={form.nama}
                         onChange={(e) => updateField('nama', e.target.value)}
-                        placeholder="Contoh: Bima Senna"
+                        placeholder="Contoh: Ahmad Fauzi"
                         autoComplete="name"
                       />
                     </label>
@@ -445,6 +446,17 @@ export function AffiliatePage() {
                       </label>
 
                       <label className="affiliate-field">
+                        <span className="affiliate-field__label">Nama bank / e-wallet</span>
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={form.bank}
+                          onChange={(e) => updateField('bank', e.target.value)}
+                          placeholder="Contoh: BCA / Mandiri / GoPay"
+                        />
+                      </label>
+
+                      <label className="affiliate-field">
                         <span className="affiliate-field__label">Nomor rekening / e-wallet</span>
                         <input
                           type="text"
@@ -454,8 +466,8 @@ export function AffiliatePage() {
                           placeholder="Contoh: 1234567890"
                         />
                       </label>
-
-                      <label className="affiliate-field affiliate-field--full">
+ 
+                      <label className="affiliate-field">
                         <span className="affiliate-field__label">Nama pemilik rekening</span>
                         <input
                           type="text"

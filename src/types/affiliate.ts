@@ -5,6 +5,7 @@ export interface AffiliateFormData {
   email: string;
   profesi: string;
   media_sosial: string;
+  bank: string;
   rekening: string;
   nama_rekening: string;
   agree_terms: boolean;
@@ -19,6 +20,7 @@ export interface AffiliateSubmitPayload {
   email: string;
   profesi: string;
   media_sosial: string;
+  bank: string;
   rekening: string;
   nama_rekening: string;
   agree_terms: boolean;

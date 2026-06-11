@@ -27,6 +27,7 @@ export async function submitAffiliate(
     email: formData.email.trim(),
     profesi: formData.profesi.trim(),
     media_sosial: formData.media_sosial.trim(),
+    bank: formData.bank.trim(),
     rekening: formData.rekening.trim(),
     nama_rekening: formData.nama_rekening.trim(),
     agree_terms: formData.agree_terms,
