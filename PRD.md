@@ -1,12 +1,12 @@
 # PRD — Landing Page Webinar TEKAD
 
-## “Dari Bingung Arah Menjadi Siap Kerja”
+## “Mendampingi Anak Menemukan Arah dan Siap Menghadapi Dunia Kerja”
 
 ## 1. Ringkasan Produk
 
 Produk yang akan dibuat adalah landing page pendaftaran webinar gratis untuk LPK TEKAD dengan tema:
 
-**“Dari Bingung Arah Menjadi Siap Kerja”**
+**“Mendampingi Anak Menyiapkan Masa Depan di Era AI”**
 
 Landing page ini ditujukan untuk mengumpulkan database orang tua yang memiliki anak SMA/SMK, lulusan sekolah, mahasiswa, fresh graduate, gap year, atau anak yang belum memiliki arah karir yang jelas.
 
@@ -122,11 +122,11 @@ Landing page harus terasa sebagai undangan edukatif dan memberi harapan, bukan h
 
 ### 5.2 Headline Utama
 
-**Dari Bingung Arah Menjadi Siap Kerja**
+**Mendampingi Anak Menemukan Arah dan Siap Menghadapi Dunia Kerja**
 
 ### 5.3 Subheadline
 
-**Webinar gratis untuk orang tua yang ingin membantu anak setelah SMA/SMK/kuliah agar punya arah, skill praktis, dan lebih percaya diri menghadapi dunia kerja di era digital dan AI.**
+**Webinar gratis untuk orang tua yang ingin membantu anak setelah SMA/SMK/kuliah agar punya arah, skill digital, dan lebih percaya diri menghadapi dunia kerja di era AI.**
 
 ### 5.4 Tone Komunikasi
 
@@ -149,25 +149,27 @@ Gunakan tone:
 
 ### 6.1 In Scope
 
-Produk versi pertama harus mencakup:
+Produk versi pertama mencakup:
 
-1. Landing page responsif.
+1. Landing page responsif (V1 dan V2).
 2. Hero section dengan headline dan CTA.
 3. Section masalah orang tua.
 4. Section reframe/harapan.
-5. Section manfaat webinar.
-6. Section “untuk siapa webinar ini”.
-7. Section materi webinar.
-8. Section tentang TEKAD singkat.
-9. Form pendaftaran modern ala Typeform.
-10. Validasi form per step.
-11. Submit form ke Google Apps Script.
-12. Simpan data ke Google Sheet.
-13. Redirect otomatis ke WhatsApp setelah sukses.
-14. Tracking source dari query parameter.
-15. Basic success/error state.
-16. README setup Cloudflare Pages.
-17. README setup Google Apps Script dan Google Sheet.
+5. Section "Kenapa Webinar Ini Penting untuk Orang Tua".
+6. Section manfaat webinar.
+7. Section “untuk siapa webinar ini”.
+8. Section materi webinar.
+9. Section "Bonus Kesiapan Kerja Anak" (Checklist 20 Poin).
+10. Section tentang TEKAD & Tim Pemandu.
+11. Section "Kenapa Bapak/Ibu Bisa Percaya TEKAD" dengan Dokumen Legalitas resmi.
+12. Form pendaftaran conversational 3-step dengan assurance.
+13. Validasi form per step.
+14. Submit form ke Google Apps Script dan penyimpanan ke Google Sheet.
+15. Redirect otomatis ke WhatsApp setelah sukses.
+16. Tracking source dari query parameter (UTM).
+17. Meta Pixel integration (PageView, ViewContent, AddToCart, AddPaymentInfo, Lead).
+18. Halaman self-assessment interaktif /bonus/checklist dengan skoring 20 poin dinamis (tanpa form CTA pendaftaran).
+19. README setup.
 
 ### 6.2 Out of Scope untuk Versi Pertama
 
@@ -183,9 +185,6 @@ Fitur berikut tidak perlu dibuat di versi pertama:
 * A/B testing otomatis.
 * Multi-webinar management.
 * Payment/program checkout.
-* Meta Pixel/GTM wajib.
-
-Namun siapkan placeholder agar Meta Pixel/GTM bisa ditambahkan nanti.
 
 ---
 
@@ -243,11 +242,11 @@ Navigasi harus smooth scroll ke section terkait.
 
 Headline:
 
-**Dari Bingung Arah Menjadi Siap Kerja**
+**Mendampingi Anak Menemukan Arah dan Siap Menghadapi Dunia Kerja**
 
 Subheadline:
 
-**Webinar gratis untuk orang tua yang ingin membantu anak setelah SMA/SMK/kuliah agar punya arah, skill praktis, dan lebih percaya diri menghadapi dunia kerja di era digital dan AI.**
+**Webinar gratis untuk orang tua yang ingin membantu anak setelah SMA/SMK/kuliah agar punya arah, skill digital, dan lebih percaya diri menghadapi dunia kerja di era AI.**
 
 Bullet pendukung:
 
@@ -402,368 +401,72 @@ Elemen trust:
 
 ---
 
-## 9. Form Pendaftaran Modern ala Typeform
+## 9. Form Pendaftaran Conversational (Streamlined 3-Step Form)
 
 ### 9.1 Konsep Form
 
-Form pendaftaran tidak boleh berbentuk form panjang biasa. Form harus dibuat modern dan profesional seperti Typeform, yaitu:
+Form pendaftaran disederhanakan menjadi **3 langkah utama** untuk meminimalkan friksi pendaftaran dan memaksimalkan tingkat konversi (CRO), namun tetap mengumpulkan data kualitatif penting untuk follow-up:
 
-* Satu pertanyaan per layar/card.
-* Tampilan conversational.
-* Ada progress bar.
-* Ada step counter.
-* Ada tombol Back dan Next.
-* Pilihan jawaban berbentuk card modern.
+* **Satu kelompok input per layar/card**.
+* Tampilan conversational yang bersih.
+* Progress bar dan step counter.
+* Tombol Back dan Next.
+* Pilihan jawaban berbentuk card grid modern.
 * Validasi dilakukan per step.
 * Data dikirim hanya di step terakhir.
 * Setelah submit sukses, user diarahkan ke WhatsApp.
 
 Alur form:
 
-**Landing page → klik “Daftar Webinar Gratis” → form full-screen/multi-step → submit → Google Sheet → redirect WhatsApp**
+**Landing page → klik “Daftar Webinar Gratis via WhatsApp” → form full-screen 3-step → submit → Google Sheet → redirect WhatsApp**
 
 ---
 
 ### 9.2 Mode Tampilan Form
 
-Gunakan **Mode B — Full Screen Form**.
-
-Saat user klik tombol **“Daftar Webinar Gratis”**, tampil overlay/full-screen form seperti Typeform.
-
-Form full-screen harus memiliki:
+Menggunakan overlay/full-screen form. Saat user klik tombol CTA, form terbuka di atas landing page dengan:
 
 * Background bersih/premium.
 * Card pertanyaan di tengah.
 * Progress bar di atas.
-* Step counter.
+* Step counter (Langkah 1 s.d 3).
 * Tombol close untuk kembali ke landing page.
 * Tombol Back/Next.
-* Mobile-first design.
+* Mobile-friendly layout.
+* Desktop layout: footer tombol dibatasi maksimal 560px dan terpusat di tengah layar.
 
 ---
 
-### 9.3 Prinsip UX Form
-
-1. User tidak boleh melihat semua pertanyaan sekaligus.
-2. Satu layar hanya menampilkan satu pertanyaan utama.
-3. Tampilan harus clean, premium, dan mobile-first.
-4. Setiap step memiliki microcopy pendek agar terasa seperti dibimbing.
-5. Progress bar harus terlihat.
-6. Tombol harus besar dan mudah ditekan di HP.
-7. Pilihan jawaban dibuat dalam bentuk card/radio button modern.
-8. Input text harus besar, jelas, dan tidak terasa seperti form administrasi.
-9. User bisa kembali ke pertanyaan sebelumnya tanpa kehilangan jawaban.
-10. Data baru dikirim setelah semua step selesai dan user menekan tombol final.
-11. Setelah submit berhasil, redirect otomatis ke WhatsApp.
-
----
-
-### 9.4 Komponen UI Form
-
-Form harus memiliki:
-
-* Progress bar di bagian atas.
-* Step counter, contoh: **“Pertanyaan 2 dari 8”**.
-* Judul pertanyaan besar.
-* Helper text kecil.
-* Input/pilihan jawaban.
-* Tombol **“Lanjut”**.
-* Tombol **“Kembali”**.
-* Tombol close untuk kembali ke landing page.
-* Loading state saat submit.
-* Error state jika submit gagal.
-* Success state singkat sebelum redirect WhatsApp.
-
----
-
-## 10. Detail Step Form
-
-### Step 0 — Welcome Screen
-
-Title:
-
-**Siap membantu anak lebih punya arah?**
-
-Subtitle:
-
-**Jawab beberapa pertanyaan singkat agar tim TEKAD dapat mengirimkan informasi webinar yang sesuai dengan kondisi anak Bapak/Ibu.**
-
-Button:
-
-**Mulai Daftar**
-
----
-
-### Step 1 — Nama Orang Tua
-
-Question:
-
-**Nama Bapak/Ibu siapa?**
-
-Helper:
-
-**Kami akan menggunakan nama ini saat menghubungi Bapak/Ibu melalui WhatsApp.**
-
-Field:
-
-`nama_orang_tua`
-
-Type:
-
-`text`
-
-Required:
-
-`true`
-
-Placeholder:
-
-**Contoh: Ibu Siti / Bapak Ahmad**
-
-Button:
-
-**Lanjut**
-
----
-
-### Step 2 — Nomor WhatsApp
-
-Question:
-
-**Nomor WhatsApp aktif Bapak/Ibu?**
-
-Helper:
-
-**Link webinar dan informasi lanjutan akan dikirim melalui WhatsApp.**
-
-Field:
-
-`whatsapp`
-
-Type:
-
-`tel`
-
-Required:
-
-`true`
-
-Placeholder:
-
-**08xxxxxxxxxx**
-
-Validation:
-
-* Minimal 9 digit angka.
-* Terima format 08, 628, dan +628.
-* Tampilkan error jika terlalu pendek atau berisi karakter tidak valid.
-
----
-
-### Step 3 — Status Anak
-
-Question:
-
-**Saat ini anak Bapak/Ibu berada di tahap apa?**
-
-Helper:
-
-**Pilih yang paling sesuai.**
-
-Field:
-
-`status_anak`
-
-Type:
-
-`single_choice_card`
-
-Required:
-
-`true`
-
-Options:
-
-* Kelas 11 SMA/SMK
-* Kelas 12 SMA/SMK
-* Baru lulus SMA/SMK
-* Gap year / belum kuliah
-* Mahasiswa
-* Fresh graduate
-* Belum bekerja
-* Lainnya
-
-UI:
-Pilihan ditampilkan sebagai card besar, bukan dropdown kecil.
-
----
-
-### Step 4 — Kondisi Anak
-
-Question:
-
-**Kondisi mana yang paling menggambarkan anak Bapak/Ibu saat ini?**
-
-Helper:
-
-**Jawaban ini membantu kami memahami kebutuhan anak Bapak/Ibu.**
-
-Field:
-
-`kondisi_anak`
-
-Type:
-
-`single_choice_card`
-
-Required:
-
-`true`
-
-Options:
-
-* Masih bingung arah
-* Ingin langsung kerja
-* Ingin kuliah, tapi perlu skill tambahan
-* Ingin mulai usaha
-* Suka konten/media sosial
-* Suka desain/video
-* Tertarik teknologi/AI
-* Belum terlihat minatnya
-
----
-
-### Step 5 — Kekhawatiran Utama
-
-Question:
-
-**Apa kekhawatiran terbesar Bapak/Ibu tentang masa depan anak?**
-
-Helper:
-
-**Boleh ditulis singkat. Contoh: belum percaya diri, belum punya skill, terlalu sering main HP, belum tahu mau kerja apa.**
-
-Field:
-
-`kekhawatiran_utama`
-
-Type:
-
-`textarea`
-
-Required:
-
-`false`
-
-Placeholder:
-
-**Tulis kekhawatiran Bapak/Ibu di sini…**
-
-Button:
-
-**Lanjut**
-
-Secondary option:
-
-**Lewati**
-
----
-
-### Step 6 — Domisili
-
-Question:
-
-**Bapak/Ibu berdomisili di kota/kecamatan mana?**
-
-Helper:
-
-**Ini membantu kami menyesuaikan informasi kegiatan dan konsultasi.**
-
-Field:
-
-`kota`
-
-Type:
-
-`text`
-
-Required:
-
-`true`
-
-Placeholder:
-
-**Contoh: Cirebon / Indramayu / Kuningan**
-
----
-
-### Step 7 — Kesediaan Konsultasi
-
-Question:
-
-**Apakah Bapak/Ibu bersedia dihubungi untuk konsultasi gratis setelah webinar?**
-
-Helper:
-
-**Konsultasi ini bertujuan membantu memetakan kondisi anak. Tidak wajib langsung mendaftar program.**
-
-Field:
-
-`bersedia_konsultasi`
-
-Type:
-
-`single_choice_card`
-
-Required:
-
-`true`
-
-Options:
-
-* Ya, saya bersedia
-* Nanti dulu, cukup ikut webinar
-
----
-
-### Step 8 — Review & Submit
-
-Title:
-
-**Terima kasih, data hampir selesai.**
-
-Subtitle:
-
-**Klik tombol di bawah ini untuk mengirim pendaftaran. Setelah berhasil, Bapak/Ibu akan diarahkan ke WhatsApp TEKAD.**
-
-Show summary:
-
-* Nama orang tua
-* WhatsApp
-* Status anak
-* Kondisi anak
-* Kota
-* Kesediaan konsultasi
-
-Button:
-
-**Kirim Pendaftaran**
-
-Back button:
-
-**Kembali**
-
-Loading:
-
-**Mengirim pendaftaran…**
-
-Success:
-
-**Pendaftaran berhasil. Mengarahkan ke WhatsApp…**
-
-Error:
-
-**Maaf, pendaftaran belum berhasil terkirim. Silakan coba lagi.**
+### 9.3 Detail Step Form
+
+#### Step 1 — Identitas (Nama & WhatsApp)
+* **Title**: Siap membantu anak lebih punya arah?
+* **Assurance Badge**: ⚡ Hanya 3 langkah, kurang dari 2 menit.
+* **Helper**: Isi nama dan nomor WhatsApp Bapak/Ibu di bawah ini untuk memulai pendaftaran webinar gratis.
+* **Fields**:
+  - `nama_orang_tua` (Input Text, required, placeholder: "Contoh: Ibu Siti / Bapak Ahmad")
+  - `whatsapp` (Input Tel, required, placeholder: "Contoh: 08123456789", min 9 digit)
+* **Button**: Lanjut
+
+#### Step 2 — Kondisi Anak
+* **Title**: Kondisi Anak Saat Ini
+* **Helper**: Pilih yang paling sesuai.
+* **Fields**:
+  - `status_anak` (Single Choice Cards Grid, required. Pilihan: Kelas 11 SMA/SMK, Kelas 12 SMA/SMK, Baru lulus SMA/SMK, Gap year / belum kuliah, Mahasiswa, Fresh graduate, Belum bekerja, Lainnya)
+  - `kondisi_anak` (Single Choice Cards Grid, required. Pilihan: Masih bingung arah, Ingin langsung kerja, Ingin kuliah tapi perlu skill tambahan, Ingin mulai usaha, Suka konten/media sosial, Suka desain/video, Tertarik teknologi/AI, Belum terlihat minatnya)
+  - `kekhawatiran_utama` (Textarea, optional, placeholder: "Boleh ditulis singkat. Contoh: belum percaya diri, kecanduan game, dll.")
+* **Buttons**: Kembali, Lanjut
+
+#### Step 3 — Domisili
+* **Title**: Satu Langkah Terakhir
+* **Helper**: Kota atau domisili Bapak/Ibu saat ini? (Membantu kami menyesuaikan info jadwal kegiatan).
+* **Fields**:
+  - `kota` (Input Text, required, placeholder: "Contoh: Cirebon / Indramayu / Kuningan")
+* **Reassurance Consent**: Dengan mendaftar, Bapak/Ibu bersedia dihubungi oleh tim TEKAD melalui WhatsApp untuk info link masuk webinar dan panduan kesiapan kerja anak.
+* **Default Values** (Auto-assigned untuk kompatibilitas database GAS):
+  - `bersedia_konsultasi` bernilai `'Belum Ditanyakan'`
+* **Buttons**: Kembali, Kirim Pendaftaran
+* **Tracking**: Event Meta Pixel `AddPaymentInfo` dipicu saat memasuki Step 3 ini.
 
 ---
 
@@ -849,7 +552,7 @@ Setelah form berhasil tersimpan, user diarahkan ke WhatsApp.
 
 Format:
 
-`https://wa.me/628xxxxxxxxxx?text=Halo%20Admin%20TEKAD%2C%20saya%20sudah%20daftar%20webinar%20Dari%20Bingung%20Arah%20Menjadi%20Siap%20Kerja.%20Mohon%20info%20jadwal%20dan%20grup%20webinarnya.`
+`https://wa.me/6285117259331?text=Halo%20Admin%20TEKAD%2C%20saya%20sudah%20daftar%20webinar%20Mendampingi%20Anak%20Menyiapkan%20Masa%20Depan%20di%20Era%20AI.%20Mohon%20info%20jadwal%20dan%20grup%20webinarnya.`
 
 Nomor WhatsApp harus diganti dengan nomor resmi TEKAD.
 
