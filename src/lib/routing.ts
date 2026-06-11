@@ -1,4 +1,4 @@
-export type AppRoute = 'webinar' | 'affiliate' | 'v2';
+export type AppRoute = 'webinar' | 'affiliate' | 'v2' | 'bonus-checklist';
 export type LpVariant = 'main' | 'v2';
 
 export function getAppRoute(pathname: string = window.location.pathname): AppRoute {
@@ -10,6 +10,10 @@ export function getAppRoute(pathname: string = window.location.pathname): AppRou
 
   if (normalized === '/v2') {
     return 'v2';
+  }
+
+  if (normalized === '/bonus/checklist') {
+    return 'bonus-checklist';
   }
 
   return 'webinar';

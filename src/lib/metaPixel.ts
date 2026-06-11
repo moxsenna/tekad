@@ -3,7 +3,7 @@ import { WEBINAR_THEME } from './webinarCopy';
 
 export const META_PIXEL_ID = '1735894211091001';
 
-export type CtaLocation = 'hero' | 'sticky' | 'roadmap' | 'final' | 'header';
+export type CtaLocation = 'hero' | 'sticky' | 'roadmap' | 'final' | 'header' | 'checklist';
 
 type FbqFunction = {
   (...args: unknown[]): void;

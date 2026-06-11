@@ -4,6 +4,7 @@ import { getAppRoute } from './lib/routing';
 import { AffiliatePage } from './pages/AffiliatePage';
 import { LandingPageV2 } from './pages/LandingPageV2';
 import { WebinarLandingPage } from './pages/WebinarLandingPage';
+import { BonusChecklistPage } from './pages/BonusChecklistPage';
 
 export default function App() {
   useEffect(() => {
@@ -18,6 +19,10 @@ export default function App() {
 
   if (route === 'v2') {
     return <LandingPageV2 />;
+  }
+
+  if (route === 'bonus-checklist') {
+    return <BonusChecklistPage />;
   }
 
   return <WebinarLandingPage />;
